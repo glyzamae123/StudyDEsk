@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StudyDesk — Grade 10 Study Dashboard (English, Math, Science, Filipino)</title>
+<meta name="description" content="StudyDesk is a free Grade 10 study dashboard for Filipino students: flashcards and quizzes in English, Math, Science, and Filipino, with a regional community board and support for Tagalog, Cebuano, Hiligaynon, Chavacano, and Ilocano.">
+<meta name="keywords" content="Grade 10, DepEd, flashcards, quiz, reviewer, English, Math, Science, Filipino, Tagalog, Cebuano, Hiligaynon, Chavacano, Ilocano">
+<meta property="og:title" content="StudyDesk — Grade 10 Study Dashboard">
+<meta property="og:description" content="Free flashcards, quizzes, and a regional community for Grade 10 students in the Philippines.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1F3D2B;
+    --bg-alt: #17301F;
+    --bg-rail: #16341F;
+    --chalk-line: rgba(245, 242, 234, 0.16);
+    --paper: #F7F3E9;
+    --paper-alt: #EFE9D8;
+    --chalk: #F5F2EA;
+    --chalk-soft: rgba(245, 242, 234, 0.62);
+    --ink: #2B2118;
+    --ink-soft: #6B5D4F;
+    --highlighter: #FFD23F;
+    --highlighter-ink: #4A3600;
+    --correct: #3FA66B;
+    --correct-bg: #E4F3EA;
+    --incorrect: #D9584C;
+    --incorrect-bg: #FAE6E3;
+    --accent-blue: #4C7DD9;
+    --accent-blue-bg: #E7EEFB;
+    --radius: 14px;
+    --serif: 'Zilla Slab', Georgia, 'Times New Roman', serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
+  }
+  :root:not([data-theme="light"]) { color-scheme: dark; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #1F3D2B; --paper: #F7F3E9; --ink: #2B2118; }
+  }
+  :root[data-theme="dark"] { --bg: #16301E; --paper: #F2EDDF; }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
+  body {
+    height: 100%; margin: 0; background: var(--bg);
+    background-image: linear-gradient(var(--chalk-line) 1px, transparent 1px), linear-gradient(90deg, var(--chalk-line) 1px, transparent 1px);
+    background-size: 100% 34px, 34px 100%; background-position: 0 64px, 0 0;
+    color: var(--chalk); font-family: var(--sans); -webkit-font-smoothing: antialiased; min-height: 100vh;
+  }
+  a { color: inherit; }
+  button { font-family: inherit; cursor: pointer; }
+
+  .app { max-width: 900px; margin: 0 auto; padding: calc(28px + env(safe-area-inset-top, 0px)) 20px 48px; }
+
+  header.top { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
+  .brand { display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
+  .brand .name { font-family: var(--serif); font-weight: 700; font-size: clamp(28px, 5vw, 36px); letter-spacing: 0.01em; position: relative; display: inline-block; }
+  .brand .name::after { content: ""; position: absolute; left: 2px; right: 6px; bottom: -5px; height: 6px; background: var(--highlighter); opacity: 0.85; border-radius: 3px; transform: rotate(-0.6deg); }
+  .brand .tag { font-size: 13px; color: var(--chalk-soft); }
+
+  .id-chip { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--chalk-soft); }
+  .id-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--correct); flex-shrink: 0; }
+  .id-chip .dot.off { background: #8a8a8a; }
+  .id-chip img { width: 22px; height: 22px; border-radius: 50%; }
+
+  nav.tabs { display: flex; gap: 2px; margin-bottom: -1px; position: relative; z-index: 2; overflow-x: auto; }
+  nav.tabs button { background: var(--bg-rail); border: none; color: var(--chalk-soft); font-family: var(--serif); font-size: 15px; font-weight: 600; padding: 11px 18px 13px; border-radius: 10px 10px 0 0; white-space: nowrap; transition: color .15s ease, background .15s ease; }
+  nav.tabs button.active { background: var(--paper); color: var(--ink); }
+  nav.tabs button:not(.active):hover { color: var(--chalk); }
+
+  .sheet { background: var(--paper); border-radius: 4px var(--radius) var(--radius) var(--radius); color: var(--ink); padding: 28px clamp(18px, 4vw, 38px) 34px 46px; position: relative; box-shadow: 0 18px 40px rgba(0,0,0,0.28); min-height: 360px; }
+  .sheet::before { content: ""; position: absolute; left: 18px; top: 0; bottom: 0; width: 1px; background: rgba(217, 90, 60, 0.18); }
+  .spiral { position: absolute; left: -1px; top: 22px; bottom: 22px; width: 18px; display: flex; flex-direction: column; justify-content: space-between; }
+  .spiral i { display: block; width: 14px; height: 14px; border-radius: 50%; background: var(--bg); box-shadow: inset 0 0 0 2px var(--paper-alt); margin-left: -7px; }
+
+  h1.section-title { font-family: var(--serif); font-size: 24px; font-weight: 600; margin: 0 0 4px; }
+  p.section-sub { color: var(--ink-soft); margin: 0 0 22px; font-size: 14.5px; max-width: 62ch; }
+
+  .empty { border: 1.5px dashed rgba(43,33,24,0.22); border-radius: 10px; padding: 34px 20px; text-align: center; color: var(--ink-soft); }
+  .empty p { margin: 0 0 14px; font-size: 14.5px; }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; background: var(--ink); color: var(--paper); border: none; border-radius: 9px; padding: 10px 18px; font-size: 14px; font-weight: 600; transition: transform .12s ease, opacity .12s ease; }
+  .btn:hover { opacity: 0.9; }
+  .btn:active { transform: scale(0.97); }
+  .btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px rgba(43,33,24,0.25); }
+  .btn.warn { background: var(--incorrect-bg); color: var(--incorrect); }
+  .btn.highlight { background: var(--highlighter); color: var(--highlighter-ink); }
+  .btn.blue { background: var(--accent-blue); color: #fff; }
+  .btn.small { padding: 7px 13px; font-size: 13px; border-radius: 7px; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .between { justify-content: space-between; }
+
+  .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; margin-top: 4px; }
+  .item-card { background: var(--paper-alt); border-radius: 10px; padding: 16px 16px 14px; border: 1px solid rgba(43,33,24,0.08); cursor: pointer; transition: box-shadow .15s ease, transform .15s ease; }
+  .item-card:hover { box-shadow: 0 6px 16px rgba(43,33,24,0.12); transform: translateY(-2px); }
+  .item-card .subject-chip { display: inline-block; font-size: 11.5px; font-weight: 600; color: var(--incorrect); background: var(--incorrect-bg); padding: 3px 9px; border-radius: 20px; margin-bottom: 9px; }
+  .item-card h3 { font-family: var(--serif); font-size: 17px; margin: 0 0 5px; }
+  .item-card .meta { font-size: 12.5px; color: var(--ink-soft); }
+
+  label.field-label { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); margin: 14px 0 6px; }
+  input[type=text], textarea, select { width: 100%; font-family: var(--sans); font-size: 14.5px; padding: 10px 12px; border-radius: 8px; border: 1.5px solid rgba(43,33,24,0.18); background: #fff; color: var(--ink); }
+  textarea { resize: vertical; min-height: 60px; }
+  input:focus, textarea:focus, select:focus, button:focus-visible { outline: 2.5px solid var(--highlighter); outline-offset: 1px; }
+
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 26, 18, 0.55); display: flex; align-items: flex-end; justify-content: center; z-index: 50; padding: 0; }
+  @media (min-width: 640px) { .modal-backdrop { align-items: center; padding: 20px; } }
+  .modal { background: var(--paper); color: var(--ink); width: 100%; max-width: 480px; max-height: 88vh; overflow-y: auto; border-radius: 16px 16px 0 0; padding: 22px 22px calc(22px + env(safe-area-inset-bottom, 0px)); }
+  @media (min-width: 640px) { .modal { border-radius: 14px; } }
+  .modal h2 { font-family: var(--serif); font-size: 20px; margin: 0 0 4px; }
+  .modal .close-x { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 20px; color: var(--ink-soft); }
+  .modal-inner { position: relative; }
+
+  .flip-stage { display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 10px 0 4px; }
+  .flip-card { width: 100%; max-width: 420px; height: 240px; perspective: 1200px; }
+  .flip-inner { position: relative; width: 100%; height: 100%; transition: transform .5s cubic-bezier(.22,.9,.32,1); transform-style: preserve-3d; }
+  .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+  .flip-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 12px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; font-family: var(--serif); font-size: 19px; line-height: 1.4; box-shadow: 0 8px 22px rgba(43,33,24,0.15); border: 1.5px solid rgba(43,33,24,0.1); }
+  .flip-face.front { background: var(--paper-alt); }
+  .flip-face.back { background: var(--highlighter); color: var(--highlighter-ink); transform: rotateY(180deg); }
+  .flip-hint { font-size: 12.5px; color: var(--ink-soft); }
+  .progress-track { width: 100%; max-width: 420px; height: 6px; background: rgba(43,33,24,0.1); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--correct); transition: width .25s ease; }
+
+  .q-option { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: var(--paper-alt); border: 1.5px solid rgba(43,33,24,0.12); border-radius: 9px; padding: 12px 14px; font-size: 14.5px; margin-bottom: 9px; color: var(--ink); }
+  .q-option:hover { border-color: rgba(43,33,24,0.3); }
+  .q-option .letter { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 1.5px solid rgba(43,33,24,0.25); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .q-option.correct { background: var(--correct-bg); border-color: var(--correct); }
+  .q-option.correct .letter { background: var(--correct); color: #fff; border-color: var(--correct); }
+  .q-option.incorrect { background: var(--incorrect-bg); border-color: var(--incorrect); }
+  .q-option.incorrect .letter { background: var(--incorrect); color: #fff; border-color: var(--incorrect); }
+  .q-option:disabled { cursor: default; }
+
+  .score-hero { text-align: center; padding: 20px 0 8px; }
+  .score-hero .big { font-family: var(--serif); font-size: 52px; font-weight: 700; }
+  .score-hero .small { color: var(--ink-soft); font-size: 14px; }
+
+  .lib-item { display: flex; align-items: flex-start; gap: 12px; padding: 14px 0; border-bottom: 1px solid rgba(43,33,24,0.1); }
+  .lib-item:last-child { border-bottom: none; }
+  .lib-item .ico { width: 34px; height: 34px; border-radius: 8px; background: var(--highlighter); color: var(--highlighter-ink); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 15px; font-weight: 700; }
+  .lib-item h4 { margin: 0 0 3px; font-size: 15px; font-family: var(--serif); }
+  .lib-item p { margin: 0; font-size: 13.5px; color: var(--ink-soft); word-break: break-word; }
+  .lib-item .row { margin-top: 6px; }
+
+  .chip-filter { background: transparent; border: 1.5px solid rgba(43,33,24,0.2); color: var(--ink-soft); border-radius: 20px; padding: 5px 13px; font-size: 12.5px; font-weight: 600; }
+  .chip-filter.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .back-link { background: none; border: none; color: var(--ink-soft); font-size: 13.5px; font-weight: 600; padding: 0; margin-bottom: 16px; display: inline-flex; align-items: center; gap: 6px; }
+  .back-link:hover { color: var(--ink); }
+
+  footer.note { text-align: center; color: var(--chalk-soft); font-size: 12px; margin-top: 22px; }
+
+  /* Community */
+  .post-card { background: var(--paper-alt); border-radius: 10px; padding: 16px 18px; border: 1px solid rgba(43,33,24,0.08); cursor: pointer; margin-bottom: 12px; transition: box-shadow .15s ease, transform .15s ease; }
+  .post-card:hover { box-shadow: 0 6px 16px rgba(43,33,24,0.12); transform: translateY(-2px); }
+  .post-card h3 { font-family: var(--serif); font-size: 17px; margin: 0 0 6px; }
+  .post-card p.preview { margin: 0 0 10px; font-size: 13.5px; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .post-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-soft); }
+  .avatar { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; background: var(--accent-blue-bg); }
+  .avatar.sm { width: 18px; height: 18px; }
+  .reply-count { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--ink-soft); margin-left: auto; }
+
+  .reply-item { display: flex; gap: 10px; padding: 12px 0; border-top: 1px solid rgba(43,33,24,0.08); }
+  .reply-item .reply-body { flex: 1; }
+  .reply-item .reply-head { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-soft); margin-bottom: 3px; }
+  .reply-item .reply-head b { color: var(--ink); font-weight: 600; }
+  .reply-item p { margin: 0; font-size: 14px; line-height: 1.45; }
+
+  .composer { display: flex; gap: 10px; align-items: flex-start; margin-top: 18px; padding-top: 16px; border-top: 1.5px dashed rgba(43,33,24,0.18); }
+  .composer textarea { min-height: 46px; }
+  .composer .btn { flex-shrink: 0; }
+
+  .banner-note { display: flex; gap: 10px; align-items: flex-start; background: var(--accent-blue-bg); color: #2E4A82; border-radius: 10px; padding: 12px 14px; font-size: 13.5px; margin-bottom: 18px; }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 8px; }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "studydesk_data_v1";
+  var state = {
+    view: "home",
+    subView: null,
+    activeId: null,
+    studyIndex: 0,
+    studyFlipped: false,
+    quizAnswers: {},
+    quizSubmitted: false,
+    quizScore: 0,
+    libFilter: "All",
+    modal: null,
+    commRegionFilter: true
+  };
+
+  var data = { decks: [], quizzes: [], resources: [] };
+
+  var PREFS_KEY = "studydesk_prefs_v1";
+  var REGIONS = ["NCR","Ilocos Region","Central Luzon","CALABARZON","Bicol Region","Western Visayas","Central Visayas","Eastern Visayas","Zamboanga Peninsula","Northern Mindanao","Davao Region"];
+  var LANGS = [
+    {code:"en", label:"English"},
+    {code:"tl", label:"Tagalog"},
+    {code:"ceb", label:"Cebuano"},
+    {code:"hil", label:"Hiligaynon"},
+    {code:"cbk", label:"Chavacano"},
+    {code:"ilo", label:"Ilocano"}
+  ];
+  var STRINGS = {
+    app_tag: {en:"Learn, quiz, and connect", tl:"Mag-aral, mag-quiz, at makipag-ugnayan", ceb:"Pagtuon, pag-quiz, ug pagkonektar", hil:"Magtuon, mag-quiz, kag magkonektar", cbk:"Aprende, quiz, y conecta", ilo:"Agadal, mag-quiz, ken makikonekta"},
+    nav_home: {en:"Home", tl:"Home", ceb:"Home", hil:"Home", cbk:"Home", ilo:"Home"},
+    nav_flash: {en:"Flashcards", tl:"Flashcards", ceb:"Flashcards", hil:"Flashcards", cbk:"Flashcards", ilo:"Flashcards"},
+    nav_quiz: {en:"Quiz", tl:"Quiz", ceb:"Quiz", hil:"Quiz", cbk:"Quiz", ilo:"Quiz"},
+    nav_lib: {en:"Library", tl:"Library", ceb:"Library", hil:"Library", cbk:"Library", ilo:"Library"},
+    nav_comm: {en:"Community", tl:"Komunidad", ceb:"Komunidad", hil:"Komunidad", cbk:"Comunidad", ilo:"Komunidad"},
+    home_title: {en:"Hey! What are we studying today?", tl:"Kumusta! Ano ang aaralin natin ngayon?", ceb:"Kumusta! Unsa ang atong tun-an karon?", hil:"Kumusta! Ano ang aton tun-an subong?", cbk:"Kumusta! Que aprende kita gayot?", ilo:"Kumusta! Ania ti adalentayo ita?"},
+    home_sub: {en:"Build flashcards for quick review, test yourself with a quiz, save useful resources, or ask a question in the community.", tl:"Gumawa ng flashcards para sa mabilisang pag-review, subukan ang sarili sa quiz, mag-save ng resources, o magtanong sa komunidad.", ceb:"Paghimo og flashcards para sa dali nga pag-review, sulayi ang imong kaugalingon sa quiz, tipigi ang mga resource, o pangutana sa komunidad.", hil:"Maghimo sang flashcards para sa dasig nga pag-review, tilawan ang imo kaugalingon sa quiz, tipigi ang mga resource, ukon mamangkot sa komunidad.", cbk:"Hace flashcards para rápido review, prueba contigo mismo na quiz, guarda mga resource, o pregunta na comunidad.", ilo:"Agaramid iti flashcards para iti nalaka a panagrepaso, suoten ti bagim iti quiz, idulin dagiti resource, wenno agsaludsod iti komunidad."},
+    btn_new_deck: {en:"New Deck", tl:"Bagong Deck", ceb:"Bag-ong Deck", hil:"Bag-o nga Deck", cbk:"Nuevo Deck", ilo:"Baro a Deck"},
+    btn_new_quiz: {en:"New Quiz", tl:"Bagong Quiz", ceb:"Bag-ong Quiz", hil:"Bag-o nga Quiz", cbk:"Nuevo Quiz", ilo:"Baro a Quiz"},
+    btn_new_resource: {en:"New Resource", tl:"Bagong Resource", ceb:"Bag-ong Resource", hil:"Bag-o nga Resource", cbk:"Nuevo Resource", ilo:"Baro a Resource"},
+    btn_new_post: {en:"New Post", tl:"Bagong Post", ceb:"Bag-ong Post", hil:"Bag-o nga Post", cbk:"Nuevo Post", ilo:"Baro a Post"},
+    flash_title: {en:"Flashcard Decks", tl:"Mga Flashcard Deck", ceb:"Mga Flashcard Deck", hil:"Mga Flashcard Deck", cbk:"Mga Flashcard Deck", ilo:"Dagiti Flashcard Deck"},
+    flash_sub: {en:"Pick a deck to review, or create a new one.", tl:"Pumili ng deck para i-review, o gumawa ng bago.", ceb:"Pilia ang deck para i-review, o paghimo og bag-o.", hil:"Pilia ang deck para i-review, ukon maghimo sang bag-o.", cbk:"Escoge un deck para review, o hace un nuevo.", ilo:"Pilien ti deck a repasuen, wenno agaramid iti baro."},
+    quiz_title_h: {en:"Quizzes", tl:"Mga Quiz", ceb:"Mga Quiz", hil:"Mga Quiz", cbk:"Mga Quiz", ilo:"Dagiti Quiz"},
+    quiz_sub: {en:"Test your knowledge with a short quiz.", tl:"Subukan ang iyong kaalaman sa maikling pagsusulit.", ceb:"Sulayi ang imong kahibalo pinaagi sa mubo nga quiz.", hil:"Tilawan ang imo kaalam paagi sa malip-ot nga quiz.", cbk:"Prueba el de tuyu conocimiento con un corto quiz.", ilo:"Suoten ti pannakaammom babaen iti ababa a quiz."},
+    lib_title: {en:"Resource Library", tl:"Resource Library", ceb:"Resource Library", hil:"Resource Library", cbk:"Resource Library", ilo:"Resource Library"},
+    lib_sub: {en:"Links and notes you can come back to anytime.", tl:"Mga link at tala na pwede mong balikan anumang oras.", ceb:"Mga link ug sulat nga pwede nimong balikan bisan unsang orasa.", hil:"Mga link kag sulat nga pwede mo balikan bisan san-o.", cbk:"Mga link y nota que puede tu bira bira kuando quiere.", ilo:"Dagiti link ken nota a mabalinmo a subliwen iti aniaman a tiempo."},
+    comm_title: {en:"Community", tl:"Komunidad", ceb:"Komunidad", hil:"Komunidad", cbk:"Comunidad", ilo:"Komunidad"},
+    comm_sub: {en:"Ask a question, share a tip, or help a classmate out.", tl:"Magtanong, mag-share ng tip, o tumulong sa kaklase.", ceb:"Pangutana, pag-share og tip, o tabangi ang imong kaubanan sa klase.", hil:"Mamangkot, mag-share sang tip, ukon buligan ang imo kaklase.", cbk:"Pregunta, comparte un tip, o ayuda con tu kaclase.", ilo:"Agsaludsod, mangibinglay iti tip, wenno tulongan ti kaklasem."},
+    btn_start_study: {en:"Start Studying", tl:"Simulan ang Pag-aaral", ceb:"Sugdi ang Pagtuon", hil:"Sugdan ang Pagtuon", cbk:"Principia Study", ilo:"Irugi ti Panagadal"},
+    btn_add_card: {en:"+ Add Card", tl:"+ Magdagdag ng Card", ceb:"+ Dugang og Card", hil:"+ Dugang sang Card", cbk:"+ Añade Card", ilo:"+ Nayunan iti Card"},
+    back_decks: {en:"Back to all decks", tl:"Bumalik sa lahat ng deck", ceb:"Balik sa tanang deck", hil:"Balik sa tanan nga deck", cbk:"Bira na todo deck", ilo:"Agsubli kadagiti amin a deck"},
+    back_quizzes: {en:"Back to all quizzes", tl:"Bumalik sa lahat ng quiz", ceb:"Balik sa tanang quiz", hil:"Balik sa tanan nga quiz", cbk:"Bira na todo quiz", ilo:"Agsubli kadagiti amin a quiz"},
+    back_community: {en:"Back to community", tl:"Bumalik sa komunidad", ceb:"Balik sa komunidad", hil:"Balik sa komunidad", cbk:"Bira na comunidad", ilo:"Agsubli iti komunidad"},
+    footer_note: {en:"Flashcards, quizzes, and library are saved locally in this browser. Community posts are shared with your region.", tl:"Naka-save lokal ang Flashcards, Quiz, at Library sa browser na ito. Shared naman ang Community posts sa region mo.", ceb:"Ang Flashcards, Quiz, ug Library gi-save lokal niini nga browser. Ang Community posts gi-share sa imong rehiyon.", hil:"Ang Flashcards, Quiz, kag Library gina-save lokal sa sini nga browser. Ang Community posts gina-share sa imo rehiyon.", cbk:"Ya guardao local el Flashcards, Quiz, y Library na este browser. El Community posts ta compartido na de tuyu region.", ilo:"Naidulin a lokal dagiti Flashcards, Quiz, ken Library iti daytoy a browser. Naibingay dagiti Community post iti rehionmo."},
+    onboard_title: {en:"Welcome to StudyDesk", tl:"Maligayang pagdating sa StudyDesk", ceb:"Maayong pag-abot sa StudyDesk", hil:"Maayong pag-abot sa StudyDesk", cbk:"Bienvenida na StudyDesk", ilo:"Naimbag nga Isasangpet iti StudyDesk"},
+    onboard_sub: {en:"Pick your region and language so we can personalize your experience.", tl:"Piliin ang region at wika mo para ma-personalize ang experience mo.", ceb:"Pilia ang imong rehiyon ug pinulongan aron ma-personalize ang imong kasinatian.", hil:"Pilia ang imo rehiyon kag lenguahe agud ma-personalize ang imo eksperyensya.", cbk:"Escoge el de tuyu region y lenguaje para personaliza el de tuyu experiencia.", ilo:"Pilien ti rehion ken pagsasaom tapno mapersonalize ti experience mo."},
+    onboard_region: {en:"Your region", tl:"Ang iyong region", ceb:"Imong rehiyon", hil:"Imo rehiyon", cbk:"De tuyu region", ilo:"Ti rehionmo"},
+    onboard_lang: {en:"Your language", tl:"Ang iyong wika", ceb:"Imong pinulongan", hil:"Imo lenguahe", cbk:"De tuyu lenguaje", ilo:"Ti pagsasaom"},
+    onboard_continue: {en:"Get Started", tl:"Magsimula", ceb:"Magsugod", hil:"Magsugod", cbk:"Principia", ilo:"Mangrugi"},
+    settings_change: {en:"Change", tl:"Palitan", ceb:"Ilisi", hil:"Islan", cbk:"Cambia", ilo:"Sukatan"},
+    comm_region_mine: {en:"My region", tl:"Region ko", ceb:"Akong rehiyon", hil:"Akon rehiyon", cbk:"De mio region", ilo:"Rehionko"},
+    comm_region_all: {en:"All regions", tl:"Lahat ng region", ceb:"Tanang rehiyon", hil:"Tanan nga rehiyon", cbk:"Todo region", ilo:"Amin a rehion"}
+  };
+  var prefs = { region: null, lang: "en" };
+  function loadPrefs(){
+    try {
+      var raw = localStorage.getItem(PREFS_KEY);
+      if (raw) prefs = JSON.parse(raw);
+    } catch(e){}
+  }
+  function savePrefs(){
+    try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch(e){}
+  }
+  function t(key){
+    var entry = STRINGS[key];
+    if (!entry) return key;
+    return entry[prefs.lang] || entry.en || key;
+  }
+
+  // ---------- Community / cloud state ----------
+  var cloud = {
+    ready: false,        // true once we've resolved whether db is usable
+    available: false,    // db capability actually usable
+    dbCap: null,
+    userCap: null,
+    viewerId: null,
+    posts: [],           // [{id, title, subject, body, authorId, createdAt}]
+    postsLoading: true,
+    unsubPosts: null,
+    replies: [],
+    repliesLoading: false,
+    unsubReplies: null,
+    profileCache: {}     // id -> {name, avatarUrl}
+  };
+
+  function loadData(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) { data = JSON.parse(raw); }
+    } catch(e) { console.warn("Load failed", e); }
+    if (!data.decks) data.decks = [];
+    if (!data.quizzes) data.quizzes = [];
+    if (!data.resources) data.resources = [];
+  }
+  function saveData(){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+    catch(e) { console.warn("Save failed", e); }
+  }
+  function uid(){ return Math.random().toString(36).slice(2,10); }
+  function esc(s){
+    var d = document.createElement('div');
+    d.textContent = s == null ? "" : s;
+    return d.innerHTML;
+  }
+  function timeAgo(ts){
+    if (!ts) return "";
+    var diff = Math.max(0, Date.now() - ts);
+    var m = Math.floor(diff/60000);
+    if (m < 1) return "just now";
+    if (m < 60) return m + "m ago";
+    var h = Math.floor(m/60);
+    if (h < 24) return h + "h ago";
+    var d = Math.floor(h/24);
+    if (d < 7) return d + "d ago";
+    return new Date(ts).toLocaleDateString();
+  }
+
+  function setView(v, sub, id){
+    if (state.view === 'community' && state.subView === 'post') unsubscribeReplies();
+    state.view = v;
+    state.subView = sub || null;
+    state.activeId = id || null;
+    state.studyIndex = 0;
+    state.studyFlipped = false;
+    state.quizAnswers = {};
+    state.quizSubmitted = false;
+    state.modal = null;
+    render();
+    window.scrollTo({top:0, behavior:'instant'});
+    if (v === 'community' && sub === 'post' && id) subscribeReplies(id);
+  }
+
+  // ---------- Seed sample content on first run ----------
+  function seedIfEmpty(){
+    if (data.decks.length || data.quizzes.length || data.resources.length) return;
+    data.decks.push({
+      id: uid(), name: "Photosynthesis Basics", subject: "Science",
+      cards: [
+        {id: uid(), front: "What is photosynthesis?", back: "The process plants use to make their own food from sunlight, water, and carbon dioxide."},
+        {id: uid(), front: "Where does photosynthesis happen inside a plant?", back: "In the chloroplast, specifically the part called chlorophyll."},
+        {id: uid(), front: "What gas do plants release after photosynthesis?", back: "Oxygen"}
+      ]
+    });
+    data.quizzes.push({
+      id: uid(), title: "General Knowledge: The Philippines", subject: "Social Studies",
+      questions: [
+        {id: uid(), q: "What is the capital of the Philippines?", options: ["Cebu City","Quezon City","Manila","Davao City"], correct: 2},
+        {id: uid(), q: "About how many islands does the Philippines have?", options: ["500", "7,641", "1,200", "10,000"], correct: 1},
+        {id: uid(), q: "Who is the national hero of the Philippines?", options: ["Andres Bonifacio","Jose Rizal","Emilio Aguinaldo","Apolinario Mabini"], correct: 1}
+      ]
+    });
+    data.resources.push(
+      {id: uid(), title: "Khan Academy", subject: "Math", type: "link", value: "https://www.khanacademy.org"},
+      {id: uid(), title: "DepEd Commons", subject: "General", type: "link", value: "https://commons.deped.gov.ph"}
+    );
+    saveData();
+  }
+
+  // ---------- Grade 10 curriculum content ----------
+  var CURR = {
+    English: [
+      ["Q1 Literary Devices", [
+        ["Simile", "Compares two things using 'like' or 'as' \u2014 e.g., 'brave as a lion'."],
+        ["Metaphor", "Directly says one thing is another, without 'like' or 'as' \u2014 e.g., 'Time is a thief'."],
+        ["Personification", "Gives human qualities to non-human things \u2014 e.g., 'The wind whispered'."],
+        ["Irony", "A contrast between what is expected and what actually happens or is said."]]],
+      ["Q2 Grammar", [
+        ["Form of the first conditional?", "If + present simple, will + base verb \u2014 e.g., 'If it rains, we will stay home.'"],
+        ["Form of the second conditional?", "If + past simple, would + base verb \u2014 e.g., 'If I were rich, I would travel.'"],
+        ["How is the passive voice formed?", "be + past participle \u2014 e.g., 'The cake was eaten.'"],
+        ["What happens to verb tense in reported speech?", "It usually shifts back one step \u2014 'I am tired' becomes 'She said she was tired.'"]]],
+      ["Q3 Persuasive Writing", [
+        ["What is a thesis statement?", "A sentence that states the main argument of an essay."],
+        ["Claim vs. evidence?", "A claim is what you argue; evidence (facts, examples, data) supports it."],
+        ["What is a counterargument?", "An opposing view that a writer acknowledges and responds to."],
+        ["What is the ad hominem fallacy?", "Attacking the person instead of addressing their argument."]]],
+      ["Q4 Research & Media", [
+        ["Primary vs. secondary source?", "Primary: original or first-hand (diary, interview). Secondary: interprets primary sources (textbook, review)."],
+        ["What is plagiarism?", "Using someone else's words or ideas without giving credit."],
+        ["Why do we cite sources?", "To give credit, let readers verify information, and avoid plagiarism."],
+        ["What is media bias?", "Presenting information in a way that favors a particular viewpoint."]]]
+    ],
+    Math: [
+      ["Q1 Sequences", [
+        ["nth term of an arithmetic sequence?", "a\u2099 = a\u2081 + (n \u2212 1)d"],
+        ["nth term of a geometric sequence?", "a\u2099 = a\u2081 \u00b7 r^(n\u22121)"],
+        ["Sum of the first n terms of an arithmetic sequence?", "S\u2099 = n/2 (a\u2081 + a\u2099)"],
+        ["What is the Fibonacci sequence?", "Each term is the sum of the two before it: 1, 1, 2, 3, 5, 8, \u2026"]]],
+      ["Q2 Polynomial Functions", [
+        ["State the Remainder Theorem.", "When P(x) is divided by (x \u2212 c), the remainder is P(c)."],
+        ["State the Factor Theorem.", "(x \u2212 c) is a factor of P(x) if and only if P(c) = 0."],
+        ["How many zeros can a polynomial of degree n have?", "At most n (counting multiplicity)."],
+        ["What is the degree of 3x\u2074 \u2212 2x\u00b2 + 7?", "4 \u2014 the highest exponent."]]],
+      ["Q3 Circles & Coordinate Geometry", [
+        ["Distance between (x\u2081, y\u2081) and (x\u2082, y\u2082)?", "d = \u221a[(x\u2082 \u2212 x\u2081)\u00b2 + (y\u2082 \u2212 y\u2081)\u00b2]"],
+        ["Midpoint formula?", "((x\u2081 + x\u2082)/2, (y\u2081 + y\u2082)/2)"],
+        ["Equation of a circle with center (h, k) and radius r?", "(x \u2212 h)\u00b2 + (y \u2212 k)\u00b2 = r\u00b2"],
+        ["Inscribed angle vs. its intercepted arc?", "The inscribed angle is half the measure of the intercepted arc."]]],
+      ["Q4 Counting, Probability & Statistics", [
+        ["Permutation formula (order matters)?", "nPr = n! / (n \u2212 r)!"],
+        ["Combination formula (order does not matter)?", "nCr = n! / [(n \u2212 r)! r!]"],
+        ["Probability of an event?", "P(E) = favorable outcomes / total outcomes"],
+        ["What does the second quartile (Q\u2082) equal?", "The median of the data set."]]]
+    ],
+    Science: [
+      ["Q1 Plate Tectonics", [
+        ["Name the three types of plate boundaries.", "Convergent (collide), divergent (move apart), transform (slide past each other)."],
+        ["Evidence for Wegener's continental drift?", "Fit of the continents, matching fossils, matching rock formations, and glacial deposits."],
+        ["What is the Ring of Fire?", "A zone around the Pacific Ocean with many volcanoes and earthquakes."],
+        ["Focus vs. epicenter of an earthquake?", "Focus: where the rupture starts underground. Epicenter: the surface point directly above it."]]],
+      ["Q2 Light, Waves & Electricity", [
+        ["Order of the EM spectrum from lowest to highest frequency?", "Radio, microwave, infrared, visible light, ultraviolet, X-ray, gamma ray."],
+        ["Speed of light in a vacuum?", "About 3 \u00d7 10\u2078 m/s."],
+        ["What does a convex lens do to parallel light rays?", "It converges (brings them together)."],
+        ["State Ohm's Law.", "V = IR (voltage = current \u00d7 resistance)."]]],
+      ["Q3 Genetics & Evolution", [
+        ["Base pairs in DNA?", "Adenine\u2013Thymine (A\u2013T) and Guanine\u2013Cytosine (G\u2013C)."],
+        ["Result of a Tt \u00d7 Tt cross?", "3:1 phenotypic ratio (dominant : recessive); genotypes 1 TT : 2 Tt : 1 tt."],
+        ["What is natural selection?", "Organisms with traits better suited to their environment survive and reproduce more."],
+        ["What is the central dogma of biology?", "DNA \u2192 RNA \u2192 protein."]]],
+      ["Q4 Gases", [
+        ["State Boyle's Law.", "At constant temperature, pressure and volume are inversely related: P\u2081V\u2081 = P\u2082V\u2082."],
+        ["State Charles's Law.", "At constant pressure, volume is directly proportional to Kelvin temperature: V\u2081/T\u2081 = V\u2082/T\u2082."],
+        ["How do you convert \u00b0C to Kelvin?", "K = \u00b0C + 273"],
+        ["Main idea of the Kinetic Molecular Theory?", "Gas particles move constantly and randomly; their average kinetic energy depends on temperature."]]]
+    ],
+    Filipino: [
+      ["Q1 Mitolohiya (Panitikang Mediterranean)", [
+        ["Ano ang mitolohiya?", "Mga kuwento tungkol sa mga diyos, diyosa, at bayani na nagpapaliwanag ng paniniwala at pinagmulan ng mga bagay sa isang kultura."],
+        ["Saan nagmula ang Panitikang Mediterranean?", "Sa mga bansang nasa paligid ng Dagat Mediterranean, tulad ng Greece, Rome, at Ehipto."],
+        ["Sino si Zeus sa mitolohiyang Griyego?", "Hari ng mga diyos at diyos ng langit at kidlat."],
+        ["Ano ang parabula?", "Maikling kuwentong may aral, kadalasang hango sa Bibliya."]]],
+      ["Q2 Maikling Kuwento", [
+        ["Ano ang mga elemento ng maikling kuwento?", "Tauhan, tagpuan, banghay, tema, at aral."],
+        ["Ano ang banghay?", "Pagkakasunod-sunod ng mga pangyayari sa kuwento."],
+        ["Ano ang tagpuan?", "Lugar at panahon kung saan nagaganap ang kuwento."],
+        ["Ano ang tunggalian?", "Tagisan ng pangunahing tauhan at ng kalaban niya \u2014 tauhan laban sa tauhan, sarili, o lipunan."]]],
+      ["Q3 Tula", [
+        ["Ano ang saknong?", "Pangkat ng mga taludtod sa isang tula."],
+        ["Ano ang sukat?", "Bilang ng pantig sa bawat taludtod."],
+        ["Ano ang tugma?", "Pagkakapareho ng tunog sa hulihan ng mga taludtod."],
+        ["Ano ang talinghaga?", "Di-tuwirang pagpapahayag na may nakatagong kahulugan."]]],
+      ["Q4 El Filibusterismo", [
+        ["Sino ang sumulat ng El Filibusterismo?", "Dr. Jos\u00e9 Rizal."],
+        ["Sino si Simoun?", "Ang mag-aalahas na si Crisostomo Ibarra na nagbalatkayo upang maghiganti."],
+        ["Para kanino inialay ni Rizal ang El Filibusterismo?", "Sa tatlong paring martir: Gomburza (G\u00f3mez, Burgos, Zamora)."],
+        ["Ano ang ibig sabihin ng El Filibusterismo?", "Ang Paghahari ng Kasakiman."]]]
+    ]
+  };
+  var CURR_QUIZ = {
+    English: ["English 10 Check", [
+      ["'The wind whispered through the trees' is an example of\u2026", ["Simile","Metaphor","Personification","Irony"], 2],
+      ["Which sentence is a second conditional?", ["If I were taller, I would play basketball.","If it rains, I will stay home.","If you heat ice, it melts.","I will go if I can."], 0],
+      ["Attacking the speaker instead of the argument is called\u2026", ["Bandwagon","Ad hominem","Circular reasoning","Hasty generalization"], 1],
+      ["Which is a primary source?", ["A history textbook","A diary written during the war","An encyclopedia","A movie review"], 1]]],
+    Math: ["Math 10 Check", [
+      ["Find the 10th term of the arithmetic sequence 2, 5, 8, \u2026", ["29","32","30","27"], 0],
+      ["If P(x) = x\u00b2 \u2212 5x + 6, what is the remainder when divided by (x \u2212 2)?", ["0","2","6","\u22122"], 0],
+      ["What is the midpoint of (2, 4) and (8, 10)?", ["(5, 7)","(10, 14)","(6, 6)","(3, 3)"], 0],
+      ["How many ways can 3 of 5 students be arranged in a line (5P3)?", ["60","10","120","15"], 0]]],
+    Science: ["Science 10 Check", [
+      ["Which plate boundary has plates moving apart?", ["Convergent","Divergent","Transform","Subduction"], 1],
+      ["Which of these has the highest frequency?", ["Radio waves","Visible light","X-rays","Microwaves"], 2],
+      ["In a Tt \u00d7 Tt cross, what is the chance of a tt offspring?", ["0%","25%","50%","75%"], 1],
+      ["At constant temperature, if pressure doubles, volume becomes\u2026", ["Doubled","Halved","Unchanged","Quadrupled"], 1]]],
+    Filipino: ["Filipino 10 Check", [
+      ["Sino ang hari ng mga diyos sa mitolohiyang Griyego?", ["Zeus","Apollo","Hermes","Ares"], 0],
+      ["Ano ang tawag sa tagisan ng pangunahing tauhan at kalaban?", ["Tagpuan","Tunggalian","Banghay","Tema"], 1],
+      ["Ano ang tawag sa pangkat ng mga taludtod sa tula?", ["Sukat","Tugma","Saknong","Talinghaga"], 2],
+      ["Sino ang sumulat ng El Filibusterismo?", ["Andres Bonifacio","Jose Rizal","Marcelo H. del Pilar","Emilio Jacinto"], 1]]]
+  };
+  function seedCurriculumV1(){
+    if (true) return;
+    data.decks = data.decks.filter(function(d){ return d.name !== "Photosynthesis Basics"; });
+    data.quizzes = data.quizzes.filter(function(q){ return q.title.indexOf("General Knowledge") !== 0; });
+    Object.keys(CURR).forEach(function(subj){
+      CURR[subj].forEach(function(unit){
+        data.decks.push({ id: uid(), name: subj + " \u00b7 " + unit[0], subject: subj, builtin: true,
+          cards: unit[1].map(function(c){ return { id: uid(), front: c[0], back: c[1] }; }) });
+      });
+    });
+    Object.keys(CURR_QUIZ).forEach(function(subj){
+      var q = CURR_QUIZ[subj];
+      data.quizzes.push({ id: uid(), title: q[0], subject: subj, builtin: true,
+        questions: q[1].map(function(x){ return { id: uid(), q: x[0], options: x[1], correct: x[2] }; }) });
+    });
+    data.curriculumV1 = true;
+    saveData();
+  }
+
+  var EXTRA = {
+    "English|Q1 Literary Devices": [
+      ["Alliteration", "Repetition of the same beginning consonant sound — e.g., 'Peter Piper picked'."],
+      ["Hyperbole", "Deliberate exaggeration for effect — e.g., 'I'm so hungry I could eat a horse'."],
+      ["Symbolism", "Using an object or image to represent a deeper idea — e.g., a dove for peace."],
+      ["Onomatopoeia", "A word that imitates a sound — e.g., 'buzz' or 'splash'."],
+      ["Foreshadowing", "Hints about events that will happen later in the story."],
+      ["Flashback", "A scene showing events from earlier than the main story."]],
+    "English|Q2 Grammar": [
+      ["Form of the zero conditional?", "If + present simple, present simple — for facts: 'If you heat ice, it melts.'"],
+      ["Form of the third conditional?", "If + past perfect, would have + past participle — 'If I had studied, I would have passed.'"],
+      ["What is subject-verb agreement?", "A singular subject takes a singular verb; a plural subject takes a plural verb."],
+      ["What are modal verbs?", "Verbs like can, may, must, and should that express ability, permission, necessity, or advice."],
+      ["What is parallel structure?", "Using the same grammatical form for items in a list — 'reading, writing, and speaking'."],
+      ["What is the active voice?", "The subject performs the action — 'The teacher graded the tests.'"]],
+    "English|Q3 Persuasive Writing": [
+      ["What is ethos?", "An appeal to the credibility or authority of the speaker."],
+      ["What is pathos?", "An appeal to the audience's emotions."],
+      ["What is logos?", "An appeal to logic, facts, and reasoning."],
+      ["What is the bandwagon fallacy?", "Arguing that something is right because many people do it."],
+      ["What is a hasty generalization?", "Drawing a broad conclusion from too little evidence."],
+      ["What is a rhetorical question?", "A question asked for effect, not to get an answer."]],
+    "English|Q4 Research & Media": [
+      ["What makes a source credible?", "A qualified author, supporting evidence, and up-to-date information."],
+      ["What is paraphrasing?", "Restating an idea in your own words while still citing the source."],
+      ["What is a bibliography?", "A list of all the sources used in a research paper."],
+      ["What is misinformation?", "False or misleading information, often presented as news."],
+      ["Fact vs. opinion?", "A fact can be verified; an opinion is a personal belief or judgment."],
+      ["Why check a source's author and date?", "To judge its credibility and whether the information is still current."]],
+    "Math|Q1 Sequences": [
+      ["What is the common difference?", "d = a₂ − a₁ — the constant added to get the next term in an arithmetic sequence."],
+      ["What is the common ratio?", "r = a₂ ÷ a₁ — the constant multiplied to get the next term in a geometric sequence."],
+      ["Sum of the first n terms of a geometric sequence?", "Sₙ = a₁(1 − rⁿ) / (1 − r), where r ≠ 1."],
+      ["Sum of an infinite geometric series?", "S = a₁ / (1 − r), when |r| < 1."],
+      ["What is the arithmetic mean of a and b?", "(a + b)/2 — the term between them in an arithmetic sequence."],
+      ["What is a harmonic sequence?", "A sequence whose reciprocals form an arithmetic sequence — e.g., 1, 1/2, 1/3, …"]],
+    "Math|Q2 Polynomial Functions": [
+      ["Standard form of a polynomial function?", "P(x) = aₙxⁿ + aₙ₋₁xⁿ⁻¹ + … + a₁x + a₀, with aₙ ≠ 0."],
+      ["What is the leading coefficient?", "The coefficient of the term with the highest degree."],
+      ["What is synthetic division?", "A shortcut for dividing a polynomial by (x − c) using only the coefficients."],
+      ["What is a zero of a polynomial?", "A value c such that P(c) = 0 (an x-intercept of the graph)."],
+      ["State the Rational Root Theorem.", "Possible rational zeros are ±(factors of the constant term) ÷ (factors of the leading coefficient)."],
+      ["What determines the end behavior of a polynomial graph?", "Its degree and its leading coefficient."]],
+    "Math|Q3 Circles & Coordinate Geometry": [
+      ["Central angle vs. its intercepted arc?", "A central angle has the same measure as its intercepted arc."],
+      ["What is a chord?", "A segment joining two points on a circle."],
+      ["What is a tangent to a circle?", "A line touching the circle at exactly one point; it is perpendicular to the radius at that point."],
+      ["What is a secant?", "A line that intersects a circle at two points."],
+      ["Slope formula?", "m = (y₂ − y₁) / (x₂ − x₁)"],
+      ["Arc length formula?", "s = (θ/360°) × 2πr"]],
+    "Math|Q4 Counting, Probability & Statistics": [
+      ["State the Fundamental Counting Principle.", "If one event can occur in m ways and another in n ways, together they can occur in m × n ways."],
+      ["What is 5! (5 factorial)?", "120"],
+      ["What are mutually exclusive events?", "Events that cannot happen at the same time; P(A or B) = P(A) + P(B)."],
+      ["What are independent events?", "One event does not affect the other; P(A and B) = P(A) × P(B)."],
+      ["Probability of the complement of an event?", "P(not E) = 1 − P(E)"],
+      ["Permutation or combination: how do you decide?", "If order matters, use a permutation; if it does not, use a combination."]],
+    "Science|Q1 Plate Tectonics": [
+      ["What is the lithosphere?", "The rigid outer layer of Earth (crust and uppermost mantle), broken into plates."],
+      ["What is subduction?", "When one plate sinks beneath another at a convergent boundary."],
+      ["What is seafloor spreading?", "New oceanic crust forms at mid-ocean ridges as plates move apart."],
+      ["Magma vs. lava?", "Magma is molten rock underground; lava is molten rock that has reached the surface."],
+      ["What are P-waves and S-waves?", "P-waves are the faster, compressional waves; S-waves are slower shear waves."],
+      ["Magnitude vs. intensity of an earthquake?", "Magnitude measures the energy released; intensity measures the effects felt at a location."]],
+    "Science|Q2 Light, Waves & Electricity": [
+      ["State the law of reflection.", "The angle of incidence equals the angle of reflection."],
+      ["What is refraction?", "The bending of light as it passes from one medium to another."],
+      ["What is a concave mirror?", "A mirror that curves inward; it can form real or virtual images depending on the object's position."],
+      ["Image formed by a plane mirror?", "Virtual, upright, same size, and laterally reversed."],
+      ["Units of current, voltage, and resistance?", "Ampere (A), volt (V), and ohm (Ω)."],
+      ["Series vs. parallel circuit?", "Series: one path, same current. Parallel: several paths, same voltage across each branch."]],
+    "Science|Q3 Genetics & Evolution": [
+      ["What is a gene?", "A segment of DNA that codes for a trait."],
+      ["What is an allele?", "One of the alternative forms of a gene."],
+      ["Genotype vs. phenotype?", "Genotype is the genetic makeup (Tt); phenotype is the observable trait (tall)."],
+      ["Dominant vs. recessive allele?", "A dominant allele shows when present; a recessive allele shows only when two copies are present."],
+      ["What is a mutation?", "A change in the DNA sequence."],
+      ["What are homologous structures?", "Body parts with a similar structure from a common ancestor — e.g., a human arm and a bat wing."]],
+    "Science|Q4 Gases": [
+      ["State Gay-Lussac's Law.", "At constant volume, pressure is directly proportional to Kelvin temperature: P₁/T₁ = P₂/T₂."],
+      ["State the Combined Gas Law.", "P₁V₁/T₁ = P₂V₂/T₂"],
+      ["State Avogadro's Law.", "At constant temperature and pressure, volume is directly proportional to the number of moles of gas."],
+      ["Why must gas-law temperatures be in Kelvin?", "Kelvin starts at absolute zero, so the proportional relationships work."],
+      ["What is absolute zero?", "0 K (−273 °C), the lowest possible temperature."],
+      ["What causes gas pressure?", "Gas particles colliding with the walls of the container."]],
+    "Filipino|Q1 Mitolohiya (Panitikang Mediterranean)": [
+      ["Sino si Athena?", "Diyosa ng karunungan at digmaan."],
+      ["Sino si Poseidon?", "Diyos ng dagat at lindol."],
+      ["Sino si Hades?", "Diyos ng mundong ilalim o kamatayan."],
+      ["Sino si Aphrodite?", "Diyosa ng pag-ibig at kagandahan."],
+      ["Ano ang epiko?", "Mahabang tulang pasalaysay tungkol sa kabayanihan ng isang bayani."],
+      ["Ano ang kahalagahan ng mitolohiya?", "Ipinapakita nito ang paniniwala, kultura, at pagpapahalaga ng isang lahi."]],
+    "Filipino|Q2 Maikling Kuwento": [
+      ["Ano ang tauhan?", "Ang mga gumaganap sa kuwento."],
+      ["Sino ang pangunahing tauhan?", "Ang sentro ng kuwento at karaniwang bida."],
+      ["Sino ang antagonista?", "Ang kalaban o sumasalungat sa pangunahing tauhan."],
+      ["Ano ang kasukdulan?", "Ang pinakamataas at pinakamatinding bahagi ng kuwento."],
+      ["Ano ang kakalasan?", "Bahaging unti-unting nalulutas ang suliranin pagkatapos ng kasukdulan."],
+      ["Ano ang wakas?", "Bahaging nagtatapos ang kuwento at ipinapakita ang kinahinatnan."]],
+    "Filipino|Q3 Tula": [
+      ["Ano ang taludtod?", "Isang linya ng tula."],
+      ["Ano ang tayutay?", "Matalinghagang pagpapahayag na nagpapaganda sa pananalita."],
+      ["Ano ang pagtutulad (simile)?", "Paghahambing gamit ang mga salitang tulad ng, parang, o animo."],
+      ["Ano ang pagwawangis (metapora)?", "Tuwirang paghahambing nang walang pang-ugnay."],
+      ["Ano ang personipikasyon?", "Pagbibigay ng katangiang pantao sa bagay o hayop."],
+      ["Ano ang pagmamalabis (hiperbole)?", "Labis-labis na pagpapalabis sa pagpapahayag."]],
+    "Filipino|Q4 El Filibusterismo": [
+      ["Sino si Basilio?", "Anak ni Sisa na naging estudyante ng medisina."],
+      ["Sino si Isagani?", "Makata at kasintahan ni Paulita Gómez; kaibigan ni Basilio."],
+      ["Sino si Padre Florentino?", "Paring Pilipino na tumanggap kay Simoun sa huling bahagi ng nobela."],
+      ["Saan at kailan nailimbag ang El Filibusterismo?", "Sa Ghent, Belgium noong 1891."],
+      ["Sino si Paulita Gómez?", "Kasintahan ni Isagani na nagpakasal kay Juanito Pelaez."],
+      ["Ano ang pangunahing tema ng nobela?", "Kasakiman at katiwalian sa lipunan, at ang kabiguan ng paghihiganti."]]
+  };
+  var NEWUNITS = {
+    English: [["Vocabulary & Context Clues", [
+      ["What are context clues?", "Words or sentences around an unfamiliar word that help reveal its meaning."],
+      ["What is a synonym?", "A word with the same or nearly the same meaning — 'happy' and 'joyful'."],
+      ["What is an antonym?", "A word with the opposite meaning — 'hot' and 'cold'."],
+      ["What is a prefix?", "A word part added to the beginning that changes meaning — 'un-' in 'unhappy'."],
+      ["What is a suffix?", "A word part added to the end — '-ful' in 'hopeful'."],
+      ["What is a root word?", "The base part of a word that carries its main meaning."],
+      ["What is denotation?", "The literal dictionary meaning of a word."],
+      ["What is connotation?", "The feelings or ideas a word suggests beyond its literal meaning."],
+      ["What is an idiom?", "A phrase whose meaning is not literal — 'break the ice'."],
+      ["What are homophones?", "Words that sound alike but differ in meaning and spelling — 'their' and 'there'."]]]],
+    Math: [["Q4 Statistics & Measures of Position", [
+      ["What is the mean?", "The sum of all values divided by the number of values."],
+      ["What is the median?", "The middle value when the data are arranged in order."],
+      ["What is the mode?", "The value that appears most often."],
+      ["What is the range?", "Highest value − lowest value."],
+      ["What are quartiles?", "Three values (Q₁, Q₂, Q₃) that divide ordered data into four equal parts."],
+      ["What are deciles?", "Nine values that divide ordered data into ten equal parts."],
+      ["What are percentiles?", "Ninety-nine values that divide ordered data into one hundred equal parts."],
+      ["What is the interquartile range (IQR)?", "IQR = Q₃ − Q₁"],
+      ["The 50th percentile equals which measure?", "The median (Q₂)."],
+      ["What is the lower quartile Q₁?", "The median of the lower half of the data; about 25% of values fall below it."]]]],
+    Science: [["Q4 Chemical Reactions", [
+      ["Reactants vs. products?", "Reactants are the starting substances; products are what is formed."],
+      ["Law of Conservation of Mass?", "Mass is neither created nor destroyed in a chemical reaction."],
+      ["How do you balance a chemical equation?", "Add coefficients so each element has the same number of atoms on both sides."],
+      ["What is a synthesis reaction?", "Two or more substances combine into one: A + B → AB."],
+      ["What is a decomposition reaction?", "One compound breaks into simpler substances: AB → A + B."],
+      ["What is a single replacement reaction?", "One element replaces another in a compound: A + BC → AC + B."],
+      ["What is a double replacement reaction?", "Two compounds swap partners: AB + CD → AD + CB."],
+      ["What is combustion?", "A substance reacts with oxygen, releasing heat and light."],
+      ["Exothermic vs. endothermic?", "Exothermic reactions release heat; endothermic reactions absorb heat."],
+      ["What speeds up a chemical reaction?", "Higher temperature, greater concentration, larger surface area, and a catalyst."]]]],
+    Filipino: [["Sanaysay at Gramatika", [
+      ["Ano ang sanaysay?", "Maikling akdang tuluyan na naglalahad ng kuru-kuro o pananaw ng manunulat."],
+      ["Ano ang dalawang uri ng sanaysay?", "Pormal (seryoso, may balangkas) at di-pormal o personal (magaan, may personal na tinig)."],
+      ["Ano ang pandiwa?", "Salitang nagsasaad ng kilos o galaw."],
+      ["Ano ang pang-uri?", "Salitang naglalarawan sa pangngalan o panghalip."],
+      ["Ano ang pang-abay?", "Salitang naglalarawan sa pandiwa, pang-uri, o kapwa pang-abay."],
+      ["Ano ang pangngalan?", "Pangalan ng tao, hayop, bagay, lugar, o pangyayari."],
+      ["Ano ang pangatnig?", "Salitang nag-uugnay ng salita, parirala, o sugnay — at, ngunit, kaya."],
+      ["Ano ang pang-ukol?", "Salitang nag-uugnay ng pangngalan o panghalip sa ibang salita — sa, para sa, ayon sa."],
+      ["Pangunahing paksa vs. pantulong na kaisipan?", "Ang pangunahing paksa ang pinakadiwa; ang pantulong na kaisipan ang sumusuporta rito."],
+      ["Ano ang talata?", "Pangkat ng mga pangungusap na nagpapahayag ng isang kaisipan."]]]]
+  };
+  var RESOURCES = [
+    ["Google Scholar", "General", "https://scholar.google.com"],
+    ["Aklatang Bayan Online (UP Diliman)", "Filipino", "https://www.swfupdiliman.org/aklatangbayan/"],
+    ["UP Diliman Main Library Search", "General", "https://mainlib.upd.edu.ph/search/"],
+    ["Project Gutenberg (free books)", "English", "https://www.gutenberg.org"],
+    ["Purdue OWL (writing & grammar)", "English", "https://owl.purdue.edu"],
+    ["OpenStax (free textbooks)", "Math", "https://openstax.org"],
+    ["Desmos Graphing Calculator", "Math", "https://www.desmos.com/calculator"],
+    ["Wolfram MathWorld", "Math", "https://mathworld.wolfram.com"],
+    ["PhET Interactive Simulations", "Science", "https://phet.colorado.edu"],
+    ["PHIVOLCS (volcanoes & earthquakes)", "Science", "https://www.phivolcs.dost.gov.ph"],
+    ["Komisyon sa Wikang Filipino (KWF)", "Filipino", "https://kwf.gov.ph"]
+  ];
+  var shuffle = function(a){ for (var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t0 = a[i]; a[i] = a[j]; a[j] = t0; } return a; };
+  var buildQuiz = function(cards){
+    return cards.map(function(c){
+      var others = shuffle(cards.filter(function(x){ return x !== c; }).map(function(x){ return x.back; })).slice(0, 3);
+      var opts = shuffle([c.back].concat(others));
+      var q = /[?.]$/.test(c.front) ? c.front : "Which best describes: " + c.front + "?";
+      return { id: uid(), q: q, options: opts, correct: opts.indexOf(c.back) };
+    });
+  };
+  function seedCurriculum(){
+    if (data.curriculumV2) return;
+    data.decks = data.decks.filter(function(d){ return !d.builtin && d.name !== "Photosynthesis Basics"; });
+    data.quizzes = data.quizzes.filter(function(q){ return !q.builtin && q.title.indexOf("General Knowledge") !== 0; });
+    data.resources = data.resources.filter(function(r){ return !r.builtin && r.title !== "Khan Academy" && r.title !== "DepEd Commons"; });
+    Object.keys(CURR).forEach(function(subj){
+      var units = CURR[subj].map(function(u){ return [u[0], u[1].concat(EXTRA[subj + "|" + u[0]] || [])]; }).concat(NEWUNITS[subj] || []);
+      units.forEach(function(u){
+        var cards = u[1].map(function(c){ return { id: uid(), front: c[0], back: c[1] }; });
+        data.decks.push({ id: uid(), name: subj + " \u00b7 " + u[0], subject: subj, builtin: true, cards: cards });
+        data.quizzes.push({ id: uid(), title: u[0] + " Quiz", subject: subj, builtin: true, questions: buildQuiz(cards) });
+      });
+    });
+    RESOURCES.slice().reverse().forEach(function(r){
+      data.resources.unshift({ id: uid(), title: r[0], subject: r[1], type: "link", value: r[2], builtin: true });
+    });
+    data.curriculumV2 = true;
+    saveData();
+  }
+
+  // ---------- Render root ----------
+  function render(){
+    var el = document.getElementById('app');
+    el.innerHTML = '';
+    if (!prefs.region || !prefs.lang){
+      el.appendChild(onboardingView());
+      return;
+    }
+    el.appendChild(buildHeader());
+    el.appendChild(buildTabs());
+    el.appendChild(buildSheet());
+    var foot = document.createElement('footer');
+    foot.className = 'note';
+    foot.textContent = t('footer_note');
+    el.appendChild(foot);
+    if (state.modal) el.appendChild(buildModal());
+  }
+
+  function onboardingView(){
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'max-width:900px;margin:0 auto;padding:60px 20px;';
+    var card = document.createElement('div');
+    card.className = 'sheet';
+    card.style.paddingLeft = 'clamp(18px,4vw,38px)';
+    var tempLang = prefs.lang || 'en';
+    var tempRegion = prefs.region || '';
+
+    function paint(){
+      card.innerHTML = '';
+      var h = document.createElement('h1');
+      h.className = 'section-title';
+      h.textContent = STRINGS.onboard_title[tempLang] || STRINGS.onboard_title.en;
+      var sub = document.createElement('p');
+      sub.className = 'section-sub';
+      sub.textContent = STRINGS.onboard_sub[tempLang] || STRINGS.onboard_sub.en;
+      card.appendChild(h); card.appendChild(sub);
+
+      var langLabel = document.createElement('label');
+      langLabel.className = 'field-label';
+      langLabel.textContent = STRINGS.onboard_lang[tempLang] || STRINGS.onboard_lang.en;
+      var langSelect = document.createElement('select');
+      LANGS.forEach(function(l){
+        var o = document.createElement('option');
+        o.value = l.code; o.textContent = l.label;
+        if (l.code === tempLang) o.selected = true;
+        langSelect.appendChild(o);
+      });
+      langSelect.onchange = function(){ tempLang = langSelect.value; paint(); };
+      card.appendChild(langLabel); card.appendChild(langSelect);
+
+      var regionLabel = document.createElement('label');
+      regionLabel.className = 'field-label';
+      regionLabel.textContent = STRINGS.onboard_region[tempLang] || STRINGS.onboard_region.en;
+      var regionSelect = document.createElement('select');
+      var placeholder = document.createElement('option');
+      placeholder.value = ''; placeholder.textContent = '—';
+      regionSelect.appendChild(placeholder);
+      REGIONS.forEach(function(r){
+        var o = document.createElement('option');
+        o.value = r; o.textContent = r;
+        if (r === tempRegion) o.selected = true;
+        regionSelect.appendChild(o);
+      });
+      regionSelect.onchange = function(){ tempRegion = regionSelect.value; };
+      card.appendChild(regionLabel); card.appendChild(regionSelect);
+
+      var go = document.createElement('button');
+      go.className = 'btn highlight';
+      go.style.marginTop = '20px';
+      go.textContent = STRINGS.onboard_continue[tempLang] || STRINGS.onboard_continue.en;
+      go.onclick = function(){
+        if (!tempRegion) { regionSelect.focus(); return; }
+        prefs.region = tempRegion; prefs.lang = tempLang;
+        savePrefs();
+        render();
+      };
+      card.appendChild(go);
+    }
+    paint();
+    wrap.appendChild(card);
+    return wrap;
+  }
+
+  function buildHeader(){
+    var h = document.createElement('header');
+    h.className = 'top';
+
+    var brand = document.createElement('div');
+    brand.className = 'brand';
+    brand.onclick = function(){ setView('home'); };
+    var name = document.createElement('div');
+    name.className = 'name';
+    name.textContent = 'StudyDesk';
+    var tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.textContent = t('app_tag');
+    brand.appendChild(name);
+    brand.appendChild(tag);
+
+    var rightWrap = document.createElement('div');
+    rightWrap.style.cssText = 'display:flex;flex-direction:column;align-items:flex-end;gap:6px;';
+
+    var idChip = document.createElement('div');
+    idChip.className = 'id-chip';
+    if (cloud.available && cloud.viewerId){
+      var prof = cloud.profileCache[cloud.viewerId];
+      var avatarUrl = prof ? prof.avatarUrl : '';
+      idChip.innerHTML = (avatarUrl ? '<img src="'+esc(avatarUrl)+'" alt="">' : '<span class="dot"></span>') +
+        '<span>Signed in as ' + esc((prof && prof.name) || 'you') + '</span>';
+    } else if (cloud.ready && !cloud.available) {
+      idChip.innerHTML = '<span class="dot off"></span><span>Community offline in this view</span>';
+    } else {
+      idChip.innerHTML = '<span class="dot off"></span><span>Connecting…</span>';
+    }
+
+    var langBtn = document.createElement('button');
+    langBtn.className = 'chip-filter';
+    langBtn.style.cssText = 'color:var(--chalk-soft);border-color:rgba(245,242,234,0.35);';
+    var langLabelObj = LANGS.filter(function(l){ return l.code === prefs.lang; })[0];
+    langBtn.textContent = (prefs.region || '') + ' · ' + (langLabelObj ? langLabelObj.label : 'English') + ' (' + t('settings_change') + ')';
+    langBtn.onclick = function(){ prefs.region = null; render(); };
+
+    rightWrap.appendChild(idChip);
+    rightWrap.appendChild(langBtn);
+
+    h.appendChild(brand);
+    h.appendChild(rightWrap);
+    return h;
+  }
+
+  function buildTabs(){
+    var nav = document.createElement('nav');
+    nav.className = 'tabs';
+    var tabs = [
+      {key:'home', label:t('nav_home')},
+      {key:'flashcards', label:t('nav_flash')},
+      {key:'quiz', label:t('nav_quiz')},
+      {key:'library', label:t('nav_lib')},
+      {key:'community', label:t('nav_comm')}
+    ];
+    tabs.forEach(function(t){
+      var b = document.createElement('button');
+      var isActive = state.view === t.key;
+      b.className = isActive ? 'active' : '';
+      b.textContent = t.label;
+      b.onclick = function(){ setView(t.key); };
+      nav.appendChild(b);
+    });
+    return nav;
+  }
+
+  function sheetWrap(children){
+    var sheet = document.createElement('div');
+    sheet.className = 'sheet';
+    var spiral = document.createElement('div');
+    spiral.className = 'spiral';
+    for (var i=0;i<8;i++){ var dot=document.createElement('i'); spiral.appendChild(dot); }
+    sheet.appendChild(spiral);
+    var inner = document.createElement('div');
+    children.forEach(function(c){ if(c) inner.appendChild(c); });
+    sheet.appendChild(inner);
+    return sheet;
+  }
+
+  function buildSheet(){
+    if (state.view === 'home') return sheetWrap([homeView()]);
+    if (state.view === 'flashcards') return sheetWrap([flashcardsView()]);
+    if (state.view === 'quiz') return sheetWrap([quizView()]);
+    if (state.view === 'library') return sheetWrap([libraryView()]);
+    if (state.view === 'community') return sheetWrap([communityView()]);
+    return sheetWrap([homeView()]);
+  }
+
+  // ---------- HOME ----------
+  function homeView(){
+    var wrap = document.createElement('div');
+    var title = document.createElement('h1');
+    title.className = 'section-title';
+    title.textContent = t('home_title');
+    var sub = document.createElement('p');
+    sub.className = 'section-sub';
+    sub.textContent = t('home_sub');
+    wrap.appendChild(title);
+    wrap.appendChild(sub);
+
+    var sBox = document.createElement('input');
+    sBox.type = 'text';
+    sBox.placeholder = 'Search topics, subjects, or terms\u2026';
+    sBox.setAttribute('aria-label', 'Search');
+    sBox.style.marginBottom = '12px';
+    var sOut = document.createElement('div');
+    sOut.style.marginBottom = '18px';
+    sBox.oninput = function(){
+      var q = sBox.value.trim().toLowerCase();
+      sOut.innerHTML = '';
+      if (q.length < 2) return;
+      var hits = [];
+      data.decks.forEach(function(d){
+        var inCards = d.cards.some(function(c){ return (c.front + ' ' + c.back).toLowerCase().indexOf(q) !== -1; });
+        if ((d.name + ' ' + (d.subject || '')).toLowerCase().indexOf(q) !== -1 || inCards)
+          hits.push({label: d.name, kind: 'Deck', go: function(){ setView('flashcards', 'deck', d.id); }});
+      });
+      data.quizzes.forEach(function(z){
+        var inQ = z.questions.some(function(x){ return x.q.toLowerCase().indexOf(q) !== -1; });
+        if ((z.title + ' ' + (z.subject || '')).toLowerCase().indexOf(q) !== -1 || inQ)
+          hits.push({label: z.title, kind: 'Quiz', go: function(){ setView('quiz', 'take', z.id); }});
+      });
+      data.resources.forEach(function(r){
+        if ((r.title + ' ' + (r.subject || '') + ' ' + r.value).toLowerCase().indexOf(q) !== -1)
+          hits.push({label: r.title, kind: 'Resource', go: function(){ setView('library'); }});
+      });
+      if (!hits.length){ sOut.innerHTML = '<p class="section-sub">No results.</p>'; return; }
+      hits.slice(0, 12).forEach(function(h){
+        var row = document.createElement('div');
+        row.className = 'lib-item';
+        row.style.cursor = 'pointer';
+        row.innerHTML = '<div class="ico">' + h.kind.charAt(0) + '</div><div style="flex:1;"><h4>' + esc(h.label) + '</h4><p>' + h.kind + '</p></div>';
+        row.onclick = h.go;
+        sOut.appendChild(row);
+      });
+    };
+    wrap.appendChild(sBox);
+    wrap.appendChild(sOut);
+
+    var grid = document.createElement('div');
+    grid.className = 'grid-cards';
+
+    var cards = [
+      {icon:'📇', label:t('nav_flash'), desc: data.decks.length + ' · ' + t('flash_sub'), go:'flashcards'},
+      {icon:'📝', label:t('nav_quiz'), desc: data.quizzes.length + ' · ' + t('quiz_sub'), go:'quiz'},
+      {icon:'📚', label:t('nav_lib'), desc: data.resources.length + ' · ' + t('lib_sub'), go:'library'},
+      {icon:'💬', label:t('nav_comm'), desc: t('comm_sub'), go:'community'}
+    ];
+    cards.forEach(function(c){
+      var card = document.createElement('div');
+      card.className = 'item-card';
+      card.onclick = function(){ setView(c.go); };
+      card.innerHTML = '<div style="font-size:24px;margin-bottom:8px;">'+c.icon+'</div>' +
+        '<h3>'+esc(c.label)+'</h3><div class="meta">'+esc(c.desc)+'</div>';
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+    return wrap;
+  }
+
+  // ---------- FLASHCARDS ----------
+  function flashcardsView(){
+    if (state.subView === 'deck' && state.activeId) return deckDetailView();
+    if (state.subView === 'study' && state.activeId) return studyView();
+
+    var wrap = document.createElement('div');
+    wrap.appendChild(sectionHead(t('flash_title'), t('flash_sub'),
+      t('btn_new_deck'), function(){ openDeckModal(); }));
+
+    if (!data.decks.length){
+      wrap.appendChild(emptyState('You don\u2019t have any decks yet. Create your first flashcard set.', 'Create a Deck', function(){ openDeckModal(); }));
+      return wrap;
+    }
+
+    var deckFilter = state.deckFilter || 'All';
+    var fRow = document.createElement('div');
+    fRow.className = 'row';
+    fRow.style.marginBottom = '14px';
+    ['All','English','Math','Science','Filipino'].forEach(function(s){
+      var b = document.createElement('button');
+      b.className = 'chip-filter' + (deckFilter === s ? ' active' : '');
+      b.textContent = s;
+      b.onclick = function(){ state.deckFilter = s; render(); };
+      fRow.appendChild(b);
+    });
+    wrap.appendChild(fRow);
+
+    var grid = document.createElement('div');
+    grid.className = 'grid-cards';
+    data.decks.filter(function(d){ return deckFilter === 'All' || d.subject === deckFilter; }).forEach(function(d){
+      var card = document.createElement('div');
+      card.className = 'item-card';
+      card.onclick = function(){ setView('flashcards', 'deck', d.id); };
+      card.innerHTML = '<span class="subject-chip">'+esc(d.subject||'General')+'</span>' +
+        '<h3>'+esc(d.name)+'</h3><div class="meta">'+d.cards.length+' card(s)</div>';
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+    return wrap;
+  }
+
+  function deckDetailView(){
+    var deck = data.decks.find(function(d){ return d.id === state.activeId; });
+    var wrap = document.createElement('div');
+    if (!deck){ setView('flashcards'); return wrap; }
+
+    wrap.appendChild(backLink(t('back_decks'), function(){ setView('flashcards'); }));
+
+    var head = document.createElement('div');
+    head.className = 'row between';
+    head.style.marginBottom = '4px';
+    var titleWrap = document.createElement('div');
+    titleWrap.innerHTML = '<h1 class="section-title">'+esc(deck.name)+'</h1>' +
+      '<p class="section-sub" style="margin-bottom:0;">'+deck.cards.length+' card(s) &middot; '+esc(deck.subject||'General')+'</p>';
+    head.appendChild(titleWrap);
+    var delBtn = document.createElement('button');
+    delBtn.className = 'btn warn small';
+    delBtn.textContent = 'Delete';
+    delBtn.onclick = function(){
+      if (confirm('Delete the deck "'+deck.name+'"?')){
+        data.decks = data.decks.filter(function(d){ return d.id !== deck.id; });
+        saveData(); setView('flashcards');
+      }
+    };
+    head.appendChild(delBtn);
+    wrap.appendChild(head);
+
+    var actions = document.createElement('div');
+    actions.className = 'row';
+    actions.style.margin = '18px 0';
+    var studyBtn = document.createElement('button');
+    studyBtn.className = 'btn highlight';
+    studyBtn.textContent = t('btn_start_study');
+    studyBtn.disabled = deck.cards.length === 0;
+    studyBtn.onclick = function(){ setView('flashcards', 'study', deck.id); };
+    var addBtn = document.createElement('button');
+    addBtn.className = 'btn ghost';
+    addBtn.textContent = t('btn_add_card');
+    addBtn.onclick = function(){ openCardModal(deck.id); };
+    actions.appendChild(studyBtn);
+    actions.appendChild(addBtn);
+    wrap.appendChild(actions);
+
+    if (!deck.cards.length){
+      wrap.appendChild(emptyState('No cards in this deck yet.', 'Add a Card', function(){ openCardModal(deck.id); }));
+      return wrap;
+    }
+
+    var list = document.createElement('div');
+    deck.cards.forEach(function(c){
+      var row = document.createElement('div');
+      row.className = 'lib-item';
+      row.innerHTML = '<div class="ico">Q</div>' +
+        '<div style="flex:1;"><h4>'+esc(c.front)+'</h4><p>'+esc(c.back)+'</p></div>';
+      var rm = document.createElement('button');
+      rm.className = 'btn ghost small';
+      rm.textContent = 'Remove';
+      rm.onclick = function(){
+        deck.cards = deck.cards.filter(function(x){ return x.id !== c.id; });
+        saveData(); setView('flashcards', 'deck', deck.id);
+      };
+      row.appendChild(rm);
+      list.appendChild(row);
+    });
+    wrap.appendChild(list);
+    return wrap;
+  }
+
+  function studyView(){
+    var deck = data.decks.find(function(d){ return d.id === state.activeId; });
+    var wrap = document.createElement('div');
+    if (!deck || !deck.cards.length){ setView('flashcards'); return wrap; }
+
+    wrap.appendChild(backLink(t('back_decks'), function(){ setView('flashcards', 'deck', deck.id); }));
+
+    var title = document.createElement('h1');
+    title.className = 'section-title';
+    title.textContent = deck.name;
+    wrap.appendChild(title);
+
+    var idx = state.studyIndex;
+    if (idx >= deck.cards.length) idx = 0;
+    var card = deck.cards[idx];
+
+    var stage = document.createElement('div');
+    stage.className = 'flip-stage';
+
+    var track = document.createElement('div');
+    track.className = 'progress-track';
+    var fill = document.createElement('div');
+    fill.className = 'progress-fill';
+    fill.style.width = (((idx+1)/deck.cards.length)*100)+'%';
+    track.appendChild(fill);
+    stage.appendChild(track);
+
+    var flipCard = document.createElement('div');
+    flipCard.className = 'flip-card' + (state.studyFlipped ? ' flipped' : '');
+    flipCard.innerHTML =
+      '<div class="flip-inner">' +
+        '<div class="flip-face front">'+esc(card.front)+'</div>' +
+        '<div class="flip-face back">'+esc(card.back)+'</div>' +
+      '</div>';
+    flipCard.onclick = function(){ state.studyFlipped = !state.studyFlipped; render(); };
+    stage.appendChild(flipCard);
+
+    var hint = document.createElement('div');
+    hint.className = 'flip-hint';
+    hint.textContent = 'Tap to flip · Card ' + (idx+1) + ' of ' + deck.cards.length;
+    stage.appendChild(hint);
+
+    var nav = document.createElement('div');
+    nav.className = 'row';
+    nav.style.marginTop = '6px';
+    var prevBtn = document.createElement('button');
+    prevBtn.className = 'btn ghost';
+    prevBtn.textContent = '← Previous';
+    prevBtn.disabled = idx === 0;
+    prevBtn.onclick = function(){ state.studyIndex = Math.max(0, idx-1); state.studyFlipped=false; render(); };
+    var nextBtn = document.createElement('button');
+    nextBtn.className = 'btn highlight';
+    nextBtn.textContent = idx === deck.cards.length-1 ? 'Restart from beginning' : 'Next →';
+    nextBtn.onclick = function(){
+      if (idx === deck.cards.length-1){ state.studyIndex = 0; } else { state.studyIndex = idx+1; }
+      state.studyFlipped = false; render();
+    };
+    nav.appendChild(prevBtn);
+    nav.appendChild(nextBtn);
+    stage.appendChild(nav);
+
+    wrap.appendChild(stage);
+    return wrap;
+  }
+
+  // ---------- QUIZ ----------
+  function quizView(){
+    if (state.subView === 'take' && state.activeId) return quizTakeView();
+
+    var wrap = document.createElement('div');
+    wrap.appendChild(sectionHead(t('quiz_title_h'), t('quiz_sub'),
+      t('btn_new_quiz'), function(){ openQuizModal(); }));
+
+    if (!data.quizzes.length){
+      wrap.appendChild(emptyState('You don\u2019t have any quizzes yet. Create your first one.', 'Create a Quiz', function(){ openQuizModal(); }));
+      return wrap;
+    }
+
+    var quizFilter = state.quizFilter || 'All';
+    var qfRow = document.createElement('div');
+    qfRow.className = 'row';
+    qfRow.style.marginBottom = '14px';
+    ['All','English','Math','Science','Filipino'].forEach(function(s){
+      var b = document.createElement('button');
+      b.className = 'chip-filter' + (quizFilter === s ? ' active' : '');
+      b.textContent = s;
+      b.onclick = function(){ state.quizFilter = s; render(); };
+      qfRow.appendChild(b);
+    });
+    wrap.appendChild(qfRow);
+
+    var grid = document.createElement('div');
+    grid.className = 'grid-cards';
+    data.quizzes.filter(function(q){ return quizFilter === 'All' || q.subject === quizFilter; }).forEach(function(q){
+      var card = document.createElement('div');
+      card.className = 'item-card';
+      card.onclick = function(){ setView('quiz', 'take', q.id); };
+      card.innerHTML = '<span class="subject-chip">'+esc(q.subject||'General')+'</span>' +
+        '<h3>'+esc(q.title)+'</h3><div class="meta">'+q.questions.length+' question(s)</div>';
+      var delWrap = document.createElement('div');
+      delWrap.style.marginTop = '10px';
+      var del = document.createElement('button');
+      del.className = 'btn ghost small';
+      del.textContent = 'Delete';
+      del.onclick = function(e){
+        e.stopPropagation();
+        if (confirm('Delete the quiz "'+q.title+'"?')){
+          data.quizzes = data.quizzes.filter(function(x){ return x.id !== q.id; });
+          saveData(); render();
+        }
+      };
+      delWrap.appendChild(del);
+      card.appendChild(delWrap);
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+    return wrap;
+  }
+
+  function quizTakeView(){
+    var quiz = data.quizzes.find(function(q){ return q.id === state.activeId; });
+    var wrap = document.createElement('div');
+    if (!quiz){ setView('quiz'); return wrap; }
+
+    wrap.appendChild(backLink(t('back_quizzes'), function(){ setView('quiz'); }));
+
+    var title = document.createElement('h1');
+    title.className = 'section-title';
+    title.textContent = quiz.title;
+    wrap.appendChild(title);
+
+    if (state.quizSubmitted){
+      var score = state.quizScore;
+      var total = quiz.questions.length;
+      var pct = Math.round((score/total)*100);
+      var hero = document.createElement('div');
+      hero.className = 'score-hero';
+      hero.innerHTML = '<div class="big">'+score+'/'+total+'</div>' +
+        '<div class="small">'+pct+'% correct &mdash; ' + (pct>=80?'Great job! 🎉':(pct>=50?'Good effort, keep going!':'Worth reviewing this topic again.')) + '</div>';
+      wrap.appendChild(hero);
+
+      quiz.questions.forEach(function(q, i){
+        var block = document.createElement('div');
+        block.style.marginTop = '18px';
+        var qTitle = document.createElement('p');
+        qTitle.style.fontWeight = '600';
+        qTitle.style.marginBottom = '8px';
+        qTitle.textContent = (i+1)+'. '+q.q;
+        block.appendChild(qTitle);
+        q.options.forEach(function(opt, oi){
+          var picked = state.quizAnswers[q.id];
+          var cls = 'q-option';
+          if (oi === q.correct) cls += ' correct';
+          else if (oi === picked) cls += ' incorrect';
+          var o = document.createElement('div');
+          o.className = cls;
+          o.innerHTML = '<span class="letter">'+String.fromCharCode(65+oi)+'</span><span>'+esc(opt)+'</span>';
+          block.appendChild(o);
+        });
+        wrap.appendChild(block);
+      });
+
+      var retry = document.createElement('button');
+      retry.className = 'btn highlight';
+      retry.style.marginTop = '18px';
+      retry.textContent = 'Retake Quiz';
+      retry.onclick = function(){ state.quizAnswers = {}; state.quizSubmitted = false; state.quizScore = 0; render(); };
+      wrap.appendChild(retry);
+      return wrap;
+    }
+
+    quiz.questions.forEach(function(q, i){
+      var block = document.createElement('div');
+      block.style.marginTop = i===0 ? '4px' : '22px';
+      var qTitle = document.createElement('p');
+      qTitle.style.fontWeight = '600';
+      qTitle.style.marginBottom = '8px';
+      qTitle.textContent = (i+1)+'. '+q.q;
+      block.appendChild(qTitle);
+      q.options.forEach(function(opt, oi){
+        var picked = state.quizAnswers[q.id];
+        var o = document.createElement('button');
+        o.className = 'q-option';
+        if (picked === oi) { o.style.borderColor = 'var(--highlighter-ink)'; o.style.background = 'var(--highlighter)'; }
+        o.innerHTML = '<span class="letter">'+String.fromCharCode(65+oi)+'</span><span>'+esc(opt)+'</span>';
+        o.onclick = function(){ state.quizAnswers[q.id] = oi; render(); };
+        block.appendChild(o);
+      });
+      wrap.appendChild(block);
+    });
+
+    var allAnswered = quiz.questions.every(function(q){ return state.quizAnswers.hasOwnProperty(q.id); });
+    var submit = document.createElement('button');
+    submit.className = 'btn highlight';
+    submit.style.marginTop = '10px';
+    submit.textContent = 'Submit Answers';
+    submit.disabled = !allAnswered;
+    submit.onclick = function(){
+      var score = 0;
+      quiz.questions.forEach(function(q){ if (state.quizAnswers[q.id] === q.correct) score++; });
+      state.quizScore = score;
+      state.quizSubmitted = true;
+      render();
+    };
+    wrap.appendChild(submit);
+    return wrap;
+  }
+
+  // ---------- LIBRARY ----------
+  function libraryView(){
+    var wrap = document.createElement('div');
+    wrap.appendChild(sectionHead(t('lib_title'), t('lib_sub'),
+      t('btn_new_resource'), function(){ openResourceModal(); }));
+
+    if (!data.resources.length){
+      wrap.appendChild(emptyState('You don\u2019t have any saved resources yet.', 'Add a Resource', function(){ openResourceModal(); }));
+      return wrap;
+    }
+
+    var subjects = ['All'];
+    data.resources.forEach(function(r){
+      var s = r.subject || 'General';
+      if (subjects.indexOf(s) === -1) subjects.push(s);
+    });
+    var filterRow = document.createElement('div');
+    filterRow.className = 'row';
+    filterRow.style.marginBottom = '14px';
+    subjects.forEach(function(s){
+      var b = document.createElement('button');
+      b.className = 'chip-filter' + (state.libFilter === s ? ' active' : '');
+      b.textContent = s;
+      b.onclick = function(){ state.libFilter = s; render(); };
+      filterRow.appendChild(b);
+    });
+    wrap.appendChild(filterRow);
+
+    var filtered = data.resources.filter(function(r){
+      return state.libFilter === 'All' || (r.subject||'General') === state.libFilter;
+    });
+
+    var list = document.createElement('div');
+    filtered.forEach(function(r){
+      var row = document.createElement('div');
+      row.className = 'lib-item';
+      var isLink = r.type === 'link';
+      var valueHtml = isLink
+        ? '<a href="'+esc(r.value)+'" target="_blank" rel="noopener noreferrer">'+esc(r.value)+'</a>'
+        : esc(r.value);
+      row.innerHTML = '<div class="ico">'+(isLink?'🔗':'📝')+'</div>' +
+        '<div style="flex:1;"><h4>'+esc(r.title)+'</h4><p>'+valueHtml+'</p>' +
+        '<div class="row"><span class="subject-chip">'+esc(r.subject||'General')+'</span></div></div>';
+      var rm = document.createElement('button');
+      rm.className = 'btn ghost small';
+      rm.textContent = 'Remove';
+      rm.onclick = function(){
+        data.resources = data.resources.filter(function(x){ return x.id !== r.id; });
+        saveData(); render();
+      };
+      row.appendChild(rm);
+      list.appendChild(row);
+    });
+    wrap.appendChild(list);
+    return wrap;
+  }
+
+  // ---------- COMMUNITY ----------
+  function communityView(){
+    if (state.subView === 'post' && state.activeId) return communityPostView();
+
+    var wrap = document.createElement('div');
+    wrap.appendChild(sectionHead(t('comm_title'), t('comm_sub'),
+      t('btn_new_post'), function(){
+        if (!cloud.available) { alert('Community isn\u2019t available in this view right now.'); return; }
+        openPostModal();
+      }));
+
+    if (!cloud.ready){
+      wrap.appendChild(loadingNote('Connecting to the community board…'));
+      return wrap;
+    }
+    if (!cloud.available){
+      wrap.appendChild(bannerNote('Community discussion isn\u2019t available in this preview. Open the published page inside your organization on claude.ai to post and reply.'));
+      return wrap;
+    }
+    if (cloud.postsLoading){
+      wrap.appendChild(loadingNote('Loading discussions…'));
+      return wrap;
+    }
+
+    var filterRow = document.createElement('div');
+    filterRow.className = 'row';
+    filterRow.style.marginBottom = '14px';
+    var mineBtn = document.createElement('button');
+    mineBtn.className = 'chip-filter' + (state.commRegionFilter !== false ? ' active' : '');
+    mineBtn.textContent = t('comm_region_mine') + (prefs.region ? ' (' + prefs.region + ')' : '');
+    mineBtn.onclick = function(){ state.commRegionFilter = true; render(); };
+    var allBtn = document.createElement('button');
+    allBtn.className = 'chip-filter' + (state.commRegionFilter === false ? ' active' : '');
+    allBtn.textContent = t('comm_region_all');
+    allBtn.onclick = function(){ state.commRegionFilter = false; render(); };
+    filterRow.appendChild(mineBtn); filterRow.appendChild(allBtn);
+    wrap.appendChild(filterRow);
+
+    var visiblePosts = cloud.posts.filter(function(p){
+      return state.commRegionFilter === false || !prefs.region || p.region === prefs.region || !p.region;
+    });
+
+    if (!visiblePosts.length){
+      wrap.appendChild(emptyState('No discussions yet. Start the first one!', t('btn_new_post'), function(){ openPostModal(); }));
+      return wrap;
+    }
+
+    var ids = uniqueAuthorIds(visiblePosts);
+    resolveProfiles(ids);
+
+    var list = document.createElement('div');
+    visiblePosts.forEach(function(p){
+      var prof = cloud.profileCache[p.authorId];
+      var name = (prof && prof.name) || 'Someone';
+      var avatarUrl = (prof && prof.avatarUrl) || '';
+      var card = document.createElement('div');
+      card.className = 'post-card';
+      card.onclick = function(){ setView('community', 'post', p.id); };
+      card.innerHTML =
+        '<span class="subject-chip">'+esc(p.subject||'General')+'</span>' +
+        (p.region ? ' <span class="subject-chip" style="color:var(--accent-blue);background:var(--accent-blue-bg);">'+esc(p.region)+'</span>' : '') +
+        '<h3>'+esc(p.title)+'</h3>' +
+        '<p class="preview">'+esc(p.body)+'</p>' +
+        '<div class="post-meta">' +
+          (avatarUrl ? '<img class="avatar" src="'+esc(avatarUrl)+'" alt="">' : '<span class="avatar"></span>') +
+          '<span>'+esc(name)+'</span><span>&middot;</span><span>'+timeAgo(p.createdAt)+'</span>' +
+        '</div>';
+      list.appendChild(card);
+    });
+    wrap.appendChild(list);
+    return wrap;
+  }
+
+  function communityPostView(){
+    var wrap = document.createElement('div');
+    var post = cloud.posts.find(function(p){ return p.id === state.activeId; });
+
+    wrap.appendChild(backLink(t('back_community'), function(){ setView('community'); }));
+
+    if (!post){
+      wrap.appendChild(loadingNote('Loading post…'));
+      return wrap;
+    }
+
+    var authorIds = uniqueAuthorIds([post].concat(cloud.replies));
+    resolveProfiles(authorIds);
+    var prof = cloud.profileCache[post.authorId];
+    var name = (prof && prof.name) || 'Someone';
+    var avatarUrl = (prof && prof.avatarUrl) || '';
+
+    var head = document.createElement('div');
+    head.innerHTML =
+      '<span class="subject-chip">'+esc(post.subject||'General')+'</span>' +
+      '<h1 class="section-title" style="margin-top:6px;">'+esc(post.title)+'</h1>' +
+      '<div class="post-meta" style="margin-bottom:18px;">' +
+        (avatarUrl ? '<img class="avatar" src="'+esc(avatarUrl)+'" alt="">' : '<span class="avatar"></span>') +
+        '<span>'+esc(name)+'</span><span>&middot;</span><span>'+timeAgo(post.createdAt)+'</span>' +
+      '</div>' +
+      '<p style="font-size:15px;line-height:1.55;white-space:pre-wrap;">'+esc(post.body)+'</p>';
+    wrap.appendChild(head);
+
+    var repliesWrap = document.createElement('div');
+    repliesWrap.style.marginTop = '10px';
+    var repliesTitle = document.createElement('p');
+    repliesTitle.style.cssText = 'font-weight:600;font-size:13.5px;color:var(--ink-soft);margin-bottom:2px;';
+    repliesTitle.textContent = cloud.repliesLoading ? 'Loading replies…' : (cloud.replies.length + ' repl' + (cloud.replies.length===1?'y':'ies'));
+    repliesWrap.appendChild(repliesTitle);
+
+    cloud.replies.forEach(function(r){
+      var rprof = cloud.profileCache[r.authorId];
+      var rname = (rprof && rprof.name) || 'Someone';
+      var ravatar = (rprof && rprof.avatarUrl) || '';
+      var item = document.createElement('div');
+      item.className = 'reply-item';
+      item.innerHTML =
+        (ravatar ? '<img class="avatar sm" src="'+esc(ravatar)+'" alt="">' : '<span class="avatar sm"></span>') +
+        '<div class="reply-body"><div class="reply-head"><b>'+esc(rname)+'</b><span>'+timeAgo(r.createdAt)+'</span></div>' +
+        '<p>'+esc(r.body)+'</p></div>';
+      repliesWrap.appendChild(item);
+    });
+    wrap.appendChild(repliesWrap);
+
+    if (cloud.available && cloud.viewerId){
+      var composer = document.createElement('div');
+      composer.className = 'composer';
+      var textarea = document.createElement('textarea');
+      textarea.placeholder = 'Write a reply…';
+      textarea.rows = 2;
+      var sendBtn = document.createElement('button');
+      sendBtn.className = 'btn blue';
+      sendBtn.textContent = 'Reply';
+      sendBtn.onclick = function(){
+        var val = textarea.value.trim();
+        if (!val) return;
+        sendBtn.disabled = true;
+        addReply(post.id, val).then(function(){
+          textarea.value = '';
+          sendBtn.disabled = false;
+        }).catch(function(){
+          sendBtn.disabled = false;
+          alert('Couldn\u2019t send your reply. Please try again.');
+        });
+      };
+      composer.appendChild(textarea);
+      composer.appendChild(sendBtn);
+      wrap.appendChild(composer);
+    } else if (cloud.ready) {
+      wrap.appendChild(bannerNote('Sign in within your organization to reply to this post.'));
+    }
+
+    return wrap;
+  }
+
+  function uniqueAuthorIds(items){
+    var seen = {}, out = [];
+    items.forEach(function(it){
+      if (it.authorId && !seen[it.authorId]){ seen[it.authorId] = true; out.push(it.authorId); }
+    });
+    return out;
+  }
+
+  function resolveProfiles(ids){
+    var missing = ids.filter(function(id){ return !cloud.profileCache[id]; });
+    if (!missing.length || !cloud.userCap) return;
+    cloud.userCap.profiles(ids).then(function(map){
+      var changed = false;
+      Object.keys(map).forEach(function(id){
+        cloud.profileCache[id] = { name: map[id].name, avatarUrl: map[id].avatarUrl };
+        changed = true;
+      });
+      if (changed) render();
+    }).catch(function(){});
+  }
+
+  function loadingNote(msg){
+    var d = document.createElement('div');
+    d.className = 'empty';
+    d.innerHTML = '<p>'+esc(msg)+'</p>';
+    return d;
+  }
+  function bannerNote(msg){
+    var d = document.createElement('div');
+    d.className = 'banner-note';
+    d.innerHTML = '<span>ℹ️</span><span>'+esc(msg)+'</span>';
+    return d;
+  }
+
+  // ---------- shared bits ----------
+  function sectionHead(title, sub, btnLabel, onClick){
+    var wrap = document.createElement('div');
+    var row = document.createElement('div');
+    row.className = 'row between';
+    row.style.alignItems = 'flex-start';
+    var textWrap = document.createElement('div');
+    textWrap.innerHTML = '<h1 class="section-title">'+esc(title)+'</h1><p class="section-sub">'+esc(sub)+'</p>';
+    row.appendChild(textWrap);
+    var btn = document.createElement('button');
+    btn.className = 'btn highlight';
+    btn.textContent = btnLabel;
+    btn.onclick = onClick;
+    btn.style.flexShrink = '0';
+    row.appendChild(btn);
+    wrap.appendChild(row);
+    return wrap;
+  }
+
+  function emptyState(msg, btnLabel, onClick){
+    var e = document.createElement('div');
+    e.className = 'empty';
+    var p = document.createElement('p');
+    p.textContent = msg;
+    e.appendChild(p);
+    var b = document.createElement('button');
+    b.className = 'btn highlight';
+    b.textContent = btnLabel;
+    b.onclick = onClick;
+    e.appendChild(b);
+    return e;
+  }
+
+  function backLink(label, onClick){
+    var b = document.createElement('button');
+    b.className = 'back-link';
+    b.innerHTML = '← ' + esc(label);
+    b.onclick = onClick;
+    return b;
+  }
+
+  // ---------- Modals ----------
+  function openDeckModal(){ state.modal = { type: 'deck' }; render(); }
+  function openCardModal(deckId){ state.modal = { type: 'card', deckId: deckId }; render(); }
+  function openQuizModal(){ state.modal = { type: 'quiz', questions: [blankQuestion()] }; render(); }
+  function openResourceModal(){ state.modal = { type: 'resource' }; render(); }
+  function openPostModal(){ state.modal = { type: 'post' }; render(); }
+  function blankQuestion(){ return { q:'', options:['','','',''], correct:0 }; }
+  function closeModal(){ state.modal = null; render(); }
+
+  function buildModal(){
+    var backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop';
+    backdrop.onclick = function(e){ if (e.target === backdrop) closeModal(); };
+
+    var modal = document.createElement('div');
+    modal.className = 'modal';
+    var innerWrap = document.createElement('div');
+    innerWrap.className = 'modal-inner';
+
+    var closeX = document.createElement('button');
+    closeX.className = 'close-x';
+    closeX.innerHTML = '&times;';
+    closeX.onclick = closeModal;
+    innerWrap.appendChild(closeX);
+
+    if (state.modal.type === 'deck') innerWrap.appendChild(deckModalContent());
+    if (state.modal.type === 'card') innerWrap.appendChild(cardModalContent());
+    if (state.modal.type === 'quiz') innerWrap.appendChild(quizModalContent());
+    if (state.modal.type === 'resource') innerWrap.appendChild(resourceModalContent());
+    if (state.modal.type === 'post') innerWrap.appendChild(postModalContent());
+
+    modal.appendChild(innerWrap);
+    backdrop.appendChild(modal);
+    return backdrop;
+  }
+
+  function deckModalContent(){
+    var w = document.createElement('div');
+    w.innerHTML = '<h2>New Deck</h2><p class="section-sub" style="margin-top:2px;">Name your flashcard set.</p>';
+
+    var nameLabel = document.createElement('label');
+    nameLabel.className = 'field-label'; nameLabel.textContent = 'Deck Name';
+    var nameInput = document.createElement('input');
+    nameInput.type = 'text'; nameInput.placeholder = 'e.g. English Vocabulary';
+
+    var subjLabel = document.createElement('label');
+    subjLabel.className = 'field-label'; subjLabel.textContent = 'Subject';
+    var subjInput = document.createElement('input');
+    subjInput.type = 'text'; subjInput.placeholder = 'e.g. English, Math, Science';
+
+    w.appendChild(nameLabel); w.appendChild(nameInput);
+    w.appendChild(subjLabel); w.appendChild(subjInput);
+
+    var save = document.createElement('button');
+    save.className = 'btn highlight';
+    save.style.marginTop = '18px';
+    save.textContent = 'Create Deck';
+    save.onclick = function(){
+      if (!nameInput.value.trim()) { nameInput.focus(); return; }
+      var deck = { id: uid(), name: nameInput.value.trim(), subject: subjInput.value.trim(), cards: [] };
+      data.decks.push(deck);
+      saveData();
+      closeModal();
+      setView('flashcards', 'deck', deck.id);
+    };
+    w.appendChild(save);
+    return w;
+  }
+
+  function cardModalContent(){
+    var w = document.createElement('div');
+    w.innerHTML = '<h2>New Card</h2><p class="section-sub" style="margin-top:2px;">Put the question on the front, the answer on the back.</p>';
+
+    var fLabel = document.createElement('label'); fLabel.className='field-label'; fLabel.textContent='Front (Question)';
+    var fInput = document.createElement('textarea'); fInput.rows = 2;
+
+    var bLabel = document.createElement('label'); bLabel.className='field-label'; bLabel.textContent='Back (Answer)';
+    var bInput = document.createElement('textarea'); bInput.rows = 2;
+
+    w.appendChild(fLabel); w.appendChild(fInput);
+    w.appendChild(bLabel); w.appendChild(bInput);
+
+    var addAnother = document.createElement('label');
+    addAnother.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13.5px;color:var(--ink-soft);';
+    var chk = document.createElement('input');
+    chk.type = 'checkbox'; chk.style.width = 'auto'; chk.checked = true;
+    addAnother.appendChild(chk);
+    addAnother.appendChild(document.createTextNode('Add another after saving'));
+    w.appendChild(addAnother);
+
+    var save = document.createElement('button');
+    save.className = 'btn highlight';
+    save.style.marginTop = '16px';
+    save.textContent = 'Save Card';
+    save.onclick = function(){
+      if (!fInput.value.trim() || !bInput.value.trim()) return;
+      var deck = data.decks.find(function(d){ return d.id === state.modal.deckId; });
+      if (!deck) { closeModal(); return; }
+      deck.cards.push({ id: uid(), front: fInput.value.trim(), back: bInput.value.trim() });
+      saveData();
+      if (chk.checked){
+        fInput.value = ''; bInput.value = ''; fInput.focus();
+      } else {
+        closeModal();
+        setView('flashcards', 'deck', deck.id);
+      }
+    };
+    w.appendChild(save);
+    return w;
+  }
+
+  function quizModalContent(){
+    var w = document.createElement('div');
+    w.innerHTML = '<h2>New Quiz</h2><p class="section-sub" style="margin-top:2px;">Build multiple-choice questions.</p>';
+
+    var titleLabel = document.createElement('label'); titleLabel.className='field-label'; titleLabel.textContent='Quiz Title';
+    var titleInput = document.createElement('input'); titleInput.type='text'; titleInput.placeholder='e.g. Chapter 3 Review';
+
+    var subjLabel = document.createElement('label'); subjLabel.className='field-label'; subjLabel.textContent='Subject';
+    var subjInput = document.createElement('input'); subjInput.type='text'; subjInput.placeholder='e.g. Science';
+
+    w.appendChild(titleLabel); w.appendChild(titleInput);
+    w.appendChild(subjLabel); w.appendChild(subjInput);
+
+    var qContainer = document.createElement('div');
+    qContainer.style.marginTop = '10px';
+
+    function renderQuestions(){
+      qContainer.innerHTML = '';
+      state.modal.questions.forEach(function(q, qi){
+        var block = document.createElement('div');
+        block.style.cssText = 'border-top:1.5px dashed rgba(43,33,24,0.18);padding-top:14px;margin-top:14px;';
+
+        var qLabel = document.createElement('label');
+        qLabel.className = 'field-label';
+        qLabel.textContent = 'Question ' + (qi+1);
+        var qInput = document.createElement('input');
+        qInput.type = 'text'; qInput.value = q.q;
+        qInput.oninput = function(){ q.q = qInput.value; };
+        block.appendChild(qLabel); block.appendChild(qInput);
+
+        q.options.forEach(function(opt, oi){
+          var oLabel = document.createElement('label');
+          oLabel.className = 'field-label';
+          oLabel.style.marginTop = '10px';
+          oLabel.textContent = 'Choice ' + String.fromCharCode(65+oi) + (oi===q.correct ? ' (Correct Answer)' : '');
+          var oRow = document.createElement('div');
+          oRow.className = 'row';
+          var oInput = document.createElement('input');
+          oInput.type = 'text'; oInput.value = opt; oInput.style.flex = '1';
+          oInput.oninput = function(){ q.options[oi] = oInput.value; };
+          var mark = document.createElement('button');
+          mark.className = 'btn ' + (oi===q.correct ? 'highlight' : 'ghost') + ' small';
+          mark.type = 'button';
+          mark.textContent = oi===q.correct ? '✓ Correct' : 'Mark correct';
+          mark.onclick = function(){ q.correct = oi; renderQuestions(); };
+          oRow.appendChild(oInput); oRow.appendChild(mark);
+          block.appendChild(oLabel); block.appendChild(oRow);
+        });
+
+        if (state.modal.questions.length > 1){
+          var rmQ = document.createElement('button');
+          rmQ.className = 'btn ghost small';
+          rmQ.style.marginTop = '10px';
+          rmQ.textContent = 'Remove this question';
+          rmQ.onclick = function(){
+            state.modal.questions.splice(qi, 1);
+            renderQuestions();
+          };
+          block.appendChild(rmQ);
+        }
+        qContainer.appendChild(block);
+      });
+    }
+    renderQuestions();
+    w.appendChild(qContainer);
+
+    var addQ = document.createElement('button');
+    addQ.className = 'btn ghost small';
+    addQ.style.marginTop = '14px';
+    addQ.textContent = '+ Add Question';
+    addQ.onclick = function(){ state.modal.questions.push(blankQuestion()); renderQuestions(); };
+    w.appendChild(addQ);
+
+    var save = document.createElement('button');
+    save.className = 'btn highlight';
+    save.style.cssText = 'margin-top:18px;display:block;width:100%;text-align:center;justify-content:center;';
+    save.textContent = 'Save Quiz';
+    save.onclick = function(){
+      if (!titleInput.value.trim()) { titleInput.focus(); return; }
+      var validQuestions = state.modal.questions.filter(function(q){
+        return q.q.trim() && q.options.every(function(o){ return o.trim(); });
+      }).map(function(q){ return { id: uid(), q: q.q.trim(), options: q.options.map(function(o){return o.trim();}), correct: q.correct }; });
+      if (!validQuestions.length) return;
+      data.quizzes.push({ id: uid(), title: titleInput.value.trim(), subject: subjInput.value.trim(), questions: validQuestions });
+      saveData();
+      closeModal();
+      setView('quiz');
+    };
+    w.appendChild(save);
+    return w;
+  }
+
+  function resourceModalContent(){
+    var w = document.createElement('div');
+    w.innerHTML = '<h2>New Resource</h2><p class="section-sub" style="margin-top:2px;">Save a link or a short note.</p>';
+
+    var titleLabel = document.createElement('label'); titleLabel.className='field-label'; titleLabel.textContent='Title';
+    var titleInput = document.createElement('input'); titleInput.type='text'; titleInput.placeholder='e.g. Algebra Reviewer';
+
+    var subjLabel = document.createElement('label'); subjLabel.className='field-label'; subjLabel.textContent='Subject';
+    var subjInput = document.createElement('input'); subjInput.type='text'; subjInput.placeholder='e.g. Math';
+
+    var typeLabel = document.createElement('label'); typeLabel.className='field-label'; typeLabel.textContent='Type';
+    var typeSelect = document.createElement('select');
+    typeSelect.innerHTML = '<option value="link">Link</option><option value="note">Note</option>';
+
+    var valLabel = document.createElement('label'); valLabel.className='field-label'; valLabel.textContent='URL';
+    var valInput = document.createElement('textarea'); valInput.rows = 2; valInput.placeholder='https://...';
+
+    typeSelect.onchange = function(){
+      if (typeSelect.value === 'link'){
+        valLabel.textContent = 'URL'; valInput.placeholder = 'https://...'; valInput.rows = 1;
+      } else {
+        valLabel.textContent = 'Note Content'; valInput.placeholder = 'Write your note here...'; valInput.rows = 4;
+      }
+    };
+
+    w.appendChild(titleLabel); w.appendChild(titleInput);
+    w.appendChild(subjLabel); w.appendChild(subjInput);
+    w.appendChild(typeLabel); w.appendChild(typeSelect);
+    w.appendChild(valLabel); w.appendChild(valInput);
+
+    var save = document.createElement('button');
+    save.className = 'btn highlight';
+    save.style.marginTop = '16px';
+    save.textContent = 'Save';
+    save.onclick = function(){
+      if (!titleInput.value.trim() || !valInput.value.trim()) return;
+      data.resources.push({
+        id: uid(), title: titleInput.value.trim(), subject: subjInput.value.trim(),
+        type: typeSelect.value, value: valInput.value.trim()
+      });
+      saveData();
+      closeModal();
+      setView('library');
+    };
+    w.appendChild(save);
+    return w;
+  }
+
+  function postModalContent(){
+    var w = document.createElement('div');
+    w.innerHTML = '<h2>New Post</h2><p class="section-sub" style="margin-top:2px;">Ask a question or start a discussion for the community.</p>';
+
+    var titleLabel = document.createElement('label'); titleLabel.className='field-label'; titleLabel.textContent='Title';
+    var titleInput = document.createElement('input'); titleInput.type='text'; titleInput.placeholder='e.g. Help with quadratic equations?';
+
+    var subjLabel = document.createElement('label'); subjLabel.className='field-label'; subjLabel.textContent='Subject';
+    var subjInput = document.createElement('input'); subjInput.type='text'; subjInput.placeholder='e.g. Math';
+
+    var bodyLabel = document.createElement('label'); bodyLabel.className='field-label'; bodyLabel.textContent='Details';
+    var bodyInput = document.createElement('textarea'); bodyInput.rows = 4; bodyInput.placeholder='Describe your question or what you want to share…';
+
+    w.appendChild(titleLabel); w.appendChild(titleInput);
+    w.appendChild(subjLabel); w.appendChild(subjInput);
+    w.appendChild(bodyLabel); w.appendChild(bodyInput);
+
+    var save = document.createElement('button');
+    save.className = 'btn highlight';
+    save.style.marginTop = '16px';
+    save.textContent = 'Post to Community';
+    save.onclick = function(){
+      if (!titleInput.value.trim() || !bodyInput.value.trim()) return;
+      save.disabled = true;
+      addPost({
+        title: titleInput.value.trim(),
+        subject: subjInput.value.trim(),
+        body: bodyInput.value.trim()
+      }).then(function(){
+        closeModal();
+        setView('community');
+      }).catch(function(){
+        save.disabled = false;
+        alert('Couldn\u2019t publish your post. Please try again.');
+      });
+    };
+    w.appendChild(save);
+    return w;
+  }
+
+  // ---------- Cloud (db + user capability) wiring ----------
+  function initCloud(){
+    if (typeof window.claude === 'undefined' || !window.claude || !window.claude.use){
+      cloud.ready = true; cloud.available = false; render();
+      return;
+    }
+    Promise.all([window.claude.use('db'), window.claude.use('user')]).then(function(res){
+      cloud.dbCap = res[0]; cloud.userCap = res[1];
+      cloud.ready = true;
+      cloud.available = !!cloud.dbCap;
+      if (!cloud.available){ render(); return; }
+      var idPromise = cloud.userCap ? cloud.userCap.id() : Promise.resolve(null);
+      idPromise.then(function(id){
+        cloud.viewerId = id;
+        if (id && cloud.userCap) resolveProfiles([id]);
+        render();
+      }).catch(function(){ render(); });
+      subscribePosts();
+    }).catch(function(){
+      cloud.ready = true; cloud.available = false; render();
+    });
+  }
+
+  function subscribePosts(){
+    if (!cloud.dbCap) return;
+    cloud.postsLoading = true;
+    var q = cloud.dbCap.collection('posts').orderBy('createdAt', 'desc').limit(50);
+    cloud.unsubPosts = q.onSnapshot(function(snap){
+      cloud.posts = snap.docs.map(function(d){
+        var body = d.data() || {};
+        return {
+          id: d.id,
+          title: body.title || '(untitled)',
+          subject: body.subject || '',
+          body: body.body || '',
+          region: body.region || '',
+          authorId: body.authorId || null,
+          createdAt: body.createdAt || 0
+        };
+      });
+      cloud.postsLoading = false;
+      render();
+    }, function(err){
+      console.warn('posts subscription error', err);
+      cloud.postsLoading = false;
+      render();
+    });
+  }
+
+  function subscribeReplies(postId){
+    if (!cloud.dbCap) return;
+    unsubscribeReplies();
+    cloud.replies = [];
+    cloud.repliesLoading = true;
+    var q = cloud.dbCap.collection('posts').doc(postId).collection('replies').orderBy('createdAt', 'asc').limit(200);
+    cloud.unsubReplies = q.onSnapshot(function(snap){
+      cloud.replies = snap.docs.map(function(d){
+        var body = d.data() || {};
+        return { id: d.id, body: body.body || '', authorId: body.authorId || null, createdAt: body.createdAt || 0 };
+      });
+      cloud.repliesLoading = false;
+      render();
+    }, function(err){
+      console.warn('replies subscription error', err);
+      cloud.repliesLoading = false;
+      render();
+    });
+  }
+  function unsubscribeReplies(){
+    if (cloud.unsubReplies){ cloud.unsubReplies(); cloud.unsubReplies = null; }
+  }
+
+  function addPost(fields){
+    if (!cloud.dbCap) return Promise.reject(new Error('no db'));
+    return cloud.dbCap.collection('posts').add({
+      title: fields.title,
+      subject: fields.subject,
+      body: fields.body,
+      region: prefs.region || '',
+      authorId: cloud.viewerId,
+      createdAt: Date.now()
+    });
+  }
+  function addReply(postId, body){
+    if (!cloud.dbCap) return Promise.reject(new Error('no db'));
+    return cloud.dbCap.collection('posts').doc(postId).collection('replies').add({
+      body: body,
+      authorId: cloud.viewerId,
+      createdAt: Date.now()
+    });
+  }
+
+  // ---------- init ----------
+  loadPrefs();
+  loadData();
+  seedIfEmpty();
+  seedCurriculum();
+  render();
+  initCloud();
+})();
+</script>
+</body>
+</html>
